@@ -457,6 +457,12 @@
     margin: 0;
   }
 
+  .hero-blurb strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+
   @media (min-width: 640px) {
     .hero-blurb {
       gap: var(--space-4);
