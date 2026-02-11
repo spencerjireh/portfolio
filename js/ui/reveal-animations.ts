@@ -1,8 +1,4 @@
-export function initRevealAnimations(): void {
-  const revealElements = document.querySelectorAll('.reveal');
-
-  if (revealElements.length === 0) return;
-
+export function initRevealAnimations(): () => void {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -15,7 +11,33 @@ export function initRevealAnimations(): void {
     rootMargin: '0px 0px 0px 0px'
   });
 
-  requestAnimationFrame(() => {
-    revealElements.forEach(el => observer.observe(el));
+  function observeAll(root: ParentNode): void {
+    root.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+      observer.observe(el);
+    });
+  }
+
+  // Observe existing elements
+  requestAnimationFrame(() => observeAll(document));
+
+  // Observe dynamically added .reveal elements (e.g. CMS content)
+  const mutation = new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node instanceof HTMLElement) {
+          if (node.classList.contains('reveal') && !node.classList.contains('is-visible')) {
+            observer.observe(node);
+          }
+          observeAll(node);
+        }
+      }
+    }
   });
+
+  mutation.observe(document.body, { childList: true, subtree: true });
+
+  return () => {
+    observer.disconnect();
+    mutation.disconnect();
+  };
 }

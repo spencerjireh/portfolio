@@ -1,8 +1,9 @@
-/* Import order matches @layer cascade */
+/* Import order matches @layer cascade; chat.css extends the components layer */
 @import './design-tokens.css';
 @import './reset.css';
 @import './typography.css';
 @import './layout.css';
 @import './components.css';
+@import './chat.css';
 @import './animations.css';
 @import './utilities.css';

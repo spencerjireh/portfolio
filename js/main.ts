@@ -18,6 +18,7 @@ import { initExperiencePanel } from './ui/experience-panel';
 import { initSkillsInteraction } from './ui/skills-interaction';
 import { initPaintingAttribution } from './ui/painting-attribution';
 import { initCopyEmail } from './ui/copy-email';
+import { initChatWidget } from './ui/chat-widget';
 import { loadContent } from './api/content-loader';
 import { renderAllContent } from './api/renderers';
 
@@ -78,7 +79,7 @@ class Portfolio {
       sceneController: this.sceneController,
       isMobile: this.threeManager?.isMobile ?? isMobile,
     });
-    initRevealAnimations();
+    const revealDispose = initRevealAnimations();
     initSmoothScroll();
     initProjectNavigation();
     initProjectAccordion();
@@ -89,8 +90,9 @@ class Portfolio {
       isMobile,
     });
     initCopyEmail();
+    const chatDispose = initChatWidget();
 
-    this.disposers.push(navDispose, expDispose, skillsDispose);
+    this.disposers.push(navDispose, revealDispose, expDispose, skillsDispose, chatDispose);
 
     // Window resize for WebGL
     const onResize = () => this.threeManager?.resize();
