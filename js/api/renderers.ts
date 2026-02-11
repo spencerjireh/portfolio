@@ -16,6 +16,18 @@ function esc(s: string): string {
   return _escEl.innerHTML;
 }
 
+/** Escape then restore only safe inline tags: <strong>, <em>, <a href="https://...">.  */
+function safeInline(s: string): string {
+  let out = esc(s);
+  out = out.replace(/&lt;(\/?)strong&gt;/g, '<$1strong>');
+  out = out.replace(/&lt;(\/?)em&gt;/g, '<$1em>');
+  out = out.replace(
+    /&lt;a href=&quot;(https?:\/\/[^&]*(?:&amp;[^&]*)*)&quot;&gt;(.+?)&lt;\/a&gt;/g,
+    (_, url, text) => `<a href="${url.replace(/&amp;/g, '&')}" target="_blank" rel="noopener noreferrer">${text}</a>`,
+  );
+  return out;
+}
+
 function escUrl(url: string): string {
   try {
     const u = new URL(url, location.origin);
@@ -35,7 +47,7 @@ function renderHero(data: HeroData): void {
 
   name.innerHTML = `${esc(data.name)} <span class="hero-name-last">${esc(data.lastName)}</span>`;
   title.textContent = data.title;
-  blurb.innerHTML = data.blurb.map(p => `<p>${esc(p)}</p>`).join('');
+  blurb.innerHTML = data.blurb.map(p => `<p>${safeInline(p)}</p>`).join('');
   links.innerHTML = [
     `<a href="${escUrl(data.links.github)}" target="_blank" rel="noopener noreferrer">github</a>`,
     `<span class="hero-links-separator">/</span>`,
