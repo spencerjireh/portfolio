@@ -84,6 +84,10 @@
     animation-delay: 0.4s;
   }
 
+  .name-reveal-delay-3 {
+    animation-delay: 0.6s;
+  }
+
   /* Fade in */
   .fade-in {
     animation: fade-in 1s var(--ease-out);

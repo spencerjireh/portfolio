@@ -74,7 +74,7 @@
 
   .painting-title {
     font-family: var(--font-serif);
-    font-size: var(--step--1);
+    font-size: var(--text-xs);
     font-style: italic;
     font-weight: 400;
     color: var(--text-secondary);
@@ -1573,24 +1573,6 @@
         transparent 100%
       );
     }
-  }
-
-  /* Custom scrollbar for project article */
-  .project-article::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .project-article::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .project-article::-webkit-scrollbar-thumb {
-    background: hsla(30, 10%, 60%, 0.3);
-    border-radius: 2px;
-  }
-
-  .project-article::-webkit-scrollbar-thumb:hover {
-    background: hsla(30, 10%, 50%, 0.5);
   }
 
   /* Project Article Header */

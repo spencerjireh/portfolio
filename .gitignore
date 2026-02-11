@@ -6,10 +6,6 @@ node_modules/
 # Testing
 /coverage
 
-# Next.js
-/.next/
-/out/
-
 # Production
 /build
 /dist
@@ -26,12 +22,8 @@ yarn-error.log*
 # Local env files
 .env*.local
 
-# Vercel
-.vercel
-
 # Typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # Archives
 portfolio.tar.gz
@@ -42,4 +34,3 @@ portfolio.tar.gz
 
 # Claude settings (optional - keep local settings private)
 .claude/settings.local.json
-CLAUDE.md
