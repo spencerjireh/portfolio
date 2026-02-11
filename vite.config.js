@@ -14,7 +14,7 @@ export default defineConfig({
 
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: ['log'],
         drop_debugger: true
       }
     },
@@ -44,7 +44,13 @@ export default defineConfig({
   server: {
     port: 8000,
     host: '127.0.0.1',
-    open: false
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'https://folionaut.spencerjireh.com',
+        changeOrigin: true,
+      }
+    }
   },
 
   preview: {

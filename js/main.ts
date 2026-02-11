@@ -18,6 +18,8 @@ import { initExperiencePanel } from './ui/experience-panel';
 import { initSkillsInteraction } from './ui/skills-interaction';
 import { initPaintingAttribution } from './ui/painting-attribution';
 import { initCopyEmail } from './ui/copy-email';
+import { loadContent } from './api/content-loader';
+import { renderAllContent } from './api/renderers';
 
 declare global {
   interface Window {
@@ -56,6 +58,15 @@ class Portfolio {
         canvas.style.display = 'none';
       }
     }
+
+    // Start content fetch in parallel with asset loading (fire-and-forget)
+    loadContent().then(bundle => {
+      try {
+        if (bundle) renderAllContent(bundle);
+      } catch (e) {
+        console.warn('Content render failed, using hardcoded HTML:', e);
+      }
+    });
 
     await loadingManager.waitForAssets(this.threeManager);
     loadingManager.reveal();
