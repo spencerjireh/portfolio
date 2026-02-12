@@ -12,8 +12,6 @@ import { detectMobile } from './utils';
 import { initNavigation } from './ui/navigation';
 import { initRevealAnimations } from './ui/reveal-animations';
 import { initSmoothScroll } from './ui/smooth-scroll';
-import { initProjectNavigation } from './ui/project-navigation';
-import { initProjectAccordion } from './ui/project-accordion';
 import { initExperiencePanel } from './ui/experience-panel';
 import { initSkillsInteraction } from './ui/skills-interaction';
 import { initPaintingAttribution } from './ui/painting-attribution';
@@ -81,8 +79,6 @@ class Portfolio {
     });
     const revealDispose = initRevealAnimations();
     initSmoothScroll();
-    initProjectNavigation();
-    initProjectAccordion();
     const expDispose = initExperiencePanel();
     const skillsDispose = initSkillsInteraction();
     initPaintingAttribution({

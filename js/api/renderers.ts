@@ -7,6 +7,8 @@ import type {
   ContactData,
   ContentRow,
 } from './types';
+import { initProjectAccordion } from '../ui/project-accordion';
+import { initProjectNavigation } from '../ui/project-navigation';
 
 const LINK_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>`;
 
@@ -154,99 +156,133 @@ function renderSkills(items: ContentRow<SkillData>[]): void {
 // ── Projects ──
 
 function renderProjects(items: ContentRow<ProjectData>[]): void {
-  for (let i = 0; i < items.length; i++) {
-    const { data } = items[i];
+  if (items.length === 0) return;
+
+  // ── Build project section HTML ──
+  const sectionsHtml = items.map(({ data }, i) => {
     const idx = i + 1;
-    const section = document.getElementById(`project-${idx}`);
-    if (!section) continue;
 
     // Desktop sidebar meta
-    const metaContent = section.querySelector('.project-meta-content');
-    if (metaContent) {
-      let metaHtml = `<div class="project-meta-section">
-  <h4 class="project-meta-label">Tech Stack</h4>
-  <ul class="project-tech-list">
-    ${data.techStack.map(t => `<li>${esc(t)}</li>`).join('\n    ')}
-  </ul>
-</div>`;
+    let metaHtml = `<div class="project-meta-section">
+          <h4 class="project-meta-label">Tech Stack</h4>
+          <ul class="project-tech-list">
+            ${data.techStack.map(t => `<li>${esc(t)}</li>`).join('\n            ')}
+          </ul>
+        </div>`;
 
-      if (data.extraMeta?.length) {
-        for (const meta of data.extraMeta) {
-          metaHtml += `\n<div class="project-meta-section">
-  <h4 class="project-meta-label">${esc(meta.label)}</h4>
-  <p class="project-meta-value">${esc(meta.value)}</p>
-</div>`;
-        }
+    if (data.extraMeta?.length) {
+      for (const meta of data.extraMeta) {
+        metaHtml += `\n        <div class="project-meta-section">
+          <h4 class="project-meta-label">${esc(meta.label)}</h4>
+          <p class="project-meta-value">${esc(meta.value)}</p>
+        </div>`;
       }
-
-      metaHtml += `\n<div class="project-meta-links">
-  ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)} ${LINK_ICON}</a>`).join('\n  ')}
-</div>`;
-
-      if (data.metaNote) {
-        metaHtml += `\n<p class="project-meta-note">${esc(data.metaNote)}</p>`;
-      }
-
-      metaContent.innerHTML = metaHtml;
     }
 
-    // Article header
-    const numEl = section.querySelector('.project-num');
-    const titleEl = section.querySelector('.project-title');
-    const tagsEl = section.querySelector('.project-tags');
-    if (numEl) numEl.textContent = data.num;
-    if (titleEl) titleEl.textContent = data.title;
-    if (tagsEl) {
-      tagsEl.innerHTML = data.tags
-        .map(t => `<span class="project-tag">${esc(t)}</span>`)
-        .join('\n');
+    metaHtml += `\n        <div class="project-meta-links">
+          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)} ${LINK_ICON}</a>`).join('\n          ')}
+        </div>`;
+
+    if (data.metaNote) {
+      metaHtml += `\n        <p class="project-meta-note">${esc(data.metaNote)}</p>`;
     }
 
     // Mobile meta
-    const mobileMeta = section.querySelector('.project-meta-mobile');
-    if (mobileMeta) {
-      let mobileHtml = `<div class="project-meta-mobile-section">
-  <h4 class="project-meta-label">Tech Stack</h4>
-  <p class="project-meta-value">${esc(data.techStackMobile)}</p>
-</div>
-<div class="project-meta-mobile-links">
-  ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)}</a>`).join('\n  ')}
-</div>`;
+    let mobileMetaHtml = `<div class="project-meta-mobile-section">
+          <h4 class="project-meta-label">Tech Stack</h4>
+          <p class="project-meta-value">${esc(data.techStackMobile)}</p>
+        </div>
+        <div class="project-meta-mobile-links">
+          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)}</a>`).join('\n          ')}
+        </div>`;
 
-      if (data.metaNote) {
-        mobileHtml += `\n<p class="project-meta-note">${esc(data.metaNote)}</p>`;
-      }
-
-      mobileMeta.innerHTML = mobileHtml;
+    if (data.metaNote) {
+      mobileMetaHtml += `\n        <p class="project-meta-note">${esc(data.metaNote)}</p>`;
     }
 
     // Article content
-    const content = section.querySelector('.project-article-content');
-    if (content) {
-      const descriptionsHtml = data.descriptions
-        .map(d => `<p class="project-description">${esc(d)}</p>`)
-        .join('\n');
+    const descriptionsHtml = data.descriptions
+      .map(d => `<p class="project-description">${esc(d)}</p>`)
+      .join('\n        ');
 
-      const highlightsHtml = data.highlights
-        .map(h => `<li>${esc(h)}</li>`)
-        .join('\n');
+    const highlightsHtml = data.highlights
+      .map(h => `<li>${esc(h)}</li>`)
+      .join('\n            ');
 
-      content.innerHTML = `${descriptionsHtml}
-<div class="project-highlights">
-  <h4 class="project-highlights-title">${esc(data.highlightsTitle)}</h4>
-  <ul class="project-highlights-list">
-    ${highlightsHtml}
-  </ul>
-</div>`;
-    }
+    return `<section id="project-${idx}" class="section-framed section-right section-project" data-project-section="${idx}">
+    <div class="section-card">
+    <aside class="project-meta">
+      <div class="project-meta-content">
+        ${metaHtml}
+      </div>
+    </aside>
+    <article class="project-article" data-project-article>
+      <header class="project-article-header">
+        <span class="project-num">${esc(data.num)}</span>
+        <h2 class="project-title">${esc(data.title)}</h2>
+        <div class="project-tags">
+          ${data.tags.map(t => `<span class="project-tag">${esc(t)}</span>`).join('\n          ')}
+        </div>
+      </header>
+      <div class="project-meta-mobile">
+        ${mobileMetaHtml}
+      </div>
+      <div class="project-article-content">
+        ${descriptionsHtml}
+        <div class="project-highlights">
+          <h4 class="project-highlights-title">${esc(data.highlightsTitle)}</h4>
+          <ul class="project-highlights-list">
+            ${highlightsHtml}
+          </ul>
+        </div>
+      </div>
+    </article>
+    </div>
+  </section>`;
+  }).join('\n\n  ');
+
+  // ── Insert project sections before #contact ──
+  const contactSection = document.getElementById('contact');
+  if (contactSection) {
+    contactSection.insertAdjacentHTML('beforebegin', sectionsHtml);
   }
 
-  // Update projects index nav titles
-  const navItems = document.querySelectorAll('.project-index-item');
-  for (let i = 0; i < items.length && i < navItems.length; i++) {
-    const titleSpan = navItems[i].querySelector('.project-index-title');
-    if (titleSpan) titleSpan.textContent = items[i].data.title;
+  // ── Generate index nav items ──
+  const indexNav = document.querySelector('.projects-index-nav');
+  if (indexNav) {
+    indexNav.innerHTML = items.map(({ data }, i) => {
+      const idx = i + 1;
+      return `<a href="#project-${idx}" class="project-index-item" data-project-link="${idx}">
+            <span class="project-index-num">${esc(data.num)}</span>
+            <span class="project-index-title">${esc(data.title)}</span>
+          </a>`;
+    }).join('\n          ');
   }
+
+  // ── Generate side nav items ──
+  const sideNav = document.querySelector('[data-project-nav]');
+  if (sideNav) {
+    sideNav.innerHTML = items.map(({ data }, i) => {
+      const idx = i + 1;
+      return `<a href="#project-${idx}" class="project-side-nav-item" data-nav-target="${idx}">
+      <span class="project-side-nav-num">${esc(data.num)}</span>
+      <span class="project-side-nav-line"></span>
+    </a>`;
+    }).join('\n    ');
+  }
+
+  // ── Generate dot nav items ──
+  const dotsNav = document.querySelector('[data-project-dots]');
+  if (dotsNav) {
+    dotsNav.innerHTML = items.map((_, i) => {
+      const idx = i + 1;
+      return `<button class="project-dot" data-dot-target="${idx}" aria-label="Go to project ${idx}"></button>`;
+    }).join('\n    ');
+  }
+
+  // ── Init UI that depends on dynamic project DOM ──
+  initProjectNavigation();
+  initProjectAccordion();
 }
 
 // ── Contact ──
