@@ -17,7 +17,7 @@ export const seedItems: SeedItem[] = [
       title: 'Software Engineer',
       blurb: [
         'Backend-leaning software engineer building at the intersection of <strong>full-stack development</strong> and <strong>applied AI</strong>.',
-        'I build products end-to-end -- from backend architecture and infrastructure to frontend -- and integrate AI/ML where it makes the work better. Interested in agentic AI, distributed systems, and self-hosting.',
+        'I build products end-to-end -- from backend architecture and infrastructure to frontend -- and integrate AI/ML where it makes the work better. Interested in agentic AI, financial systems, distributed systems, and self-hosting.',
         '<strong>BS Computer Science</strong>, <em>Mapua University</em> (2025).',
       ],
       links: {
