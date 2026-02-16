@@ -1,9 +1,9 @@
 export function initExperiencePanel(): () => void {
   const panel = document.querySelector<HTMLElement>('[data-experience-panel]');
   const closeBtn = document.querySelector<HTMLButtonElement>('[data-panel-close]');
-  const experienceItems = document.querySelectorAll<HTMLElement>('[data-experience]');
+  const list = document.querySelector<HTMLElement>('.experience-list');
 
-  if (!panel || experienceItems.length === 0) return () => {};
+  if (!panel || !list) return () => {};
 
   const panelTitle = panel.querySelector<HTMLElement>('[data-panel-title]');
   const panelCompany = panel.querySelector<HTMLElement>('[data-panel-company]');
@@ -14,9 +14,9 @@ export function initExperiencePanel(): () => void {
   const panelLink = panel.querySelector<HTMLAnchorElement>('[data-panel-link]');
 
   let pinnedItem: HTMLElement | null = null;
+  let hoveredItem: HTMLElement | null = null;
   let isDesktop = window.innerWidth >= 1024;
   let hideTimeout: ReturnType<typeof setTimeout> | null = null;
-  let isHoveringAnyItem = false;
 
   const PANEL_LINGER_DURATION = 1000;
 
@@ -63,11 +63,11 @@ export function initExperiencePanel(): () => void {
   };
 
   const scheduleHidePanel = (): void => {
-    if (pinnedItem || isHoveringAnyItem) return;
+    if (pinnedItem || hoveredItem) return;
 
     clearHideTimeout();
     hideTimeout = setTimeout(() => {
-      if (!pinnedItem && !isHoveringAnyItem) {
+      if (!pinnedItem && !hoveredItem) {
         panel.classList.remove('is-visible');
         panel.setAttribute('aria-hidden', 'true');
       }
@@ -146,7 +146,7 @@ export function initExperiencePanel(): () => void {
   const toggleAccordion = (item: HTMLElement): void => {
     const isExpanded = item.classList.contains('is-expanded');
 
-    experienceItems.forEach(otherItem => {
+    list.querySelectorAll<HTMLElement>('[data-experience]').forEach(otherItem => {
       if (otherItem !== item && otherItem.classList.contains('is-expanded')) {
         otherItem.classList.remove('is-expanded');
         const accordion = otherItem.querySelector('.experience-accordion');
@@ -167,15 +167,68 @@ export function initExperiencePanel(): () => void {
     }
   };
 
+  // -- Delegated events on stable .experience-list container --
+
+  // mouseover bubbles (unlike mouseenter), so we track which item is hovered
+  // and only fire enter/leave logic when the hovered item actually changes.
+  const onMouseover = (e: MouseEvent): void => {
+    if (!isDesktop) return;
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-experience]');
+    if (item === hoveredItem) return;
+
+    hoveredItem = item;
+    if (item) {
+      clearHideTimeout();
+      if (!pinnedItem) showPanel(item);
+    }
+  };
+
+  // mouseleave on the container fires once when the cursor exits entirely.
+  const onMouseleave = (): void => {
+    if (!isDesktop) return;
+    hoveredItem = null;
+    scheduleHidePanel();
+  };
+
+  const onClick = (e: MouseEvent): void => {
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-experience]');
+    if (!item) return;
+
+    if (isDesktop) {
+      pinPanel(item);
+    } else {
+      toggleAccordion(item);
+    }
+  };
+
+  list.addEventListener('mouseover', onMouseover);
+  list.addEventListener('mouseleave', onMouseleave);
+  list.addEventListener('click', onClick);
+
+  // Panel hover keeps it open (panel itself is outside .experience-list)
+  const onPanelEnter = (): void => {
+    if (isDesktop) clearHideTimeout();
+  };
+  const onPanelLeave = (): void => {
+    if (isDesktop && !pinnedItem) scheduleHidePanel();
+  };
+  panel.addEventListener('mouseenter', onPanelEnter);
+  panel.addEventListener('mouseleave', onPanelLeave);
+
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePanel();
+  });
+
   const handleResize = (): void => {
     const wasDesktop = isDesktop;
     isDesktop = window.innerWidth >= 1024;
 
     if (wasDesktop !== isDesktop) {
       clearHideTimeout();
-      isHoveringAnyItem = false;
+      hoveredItem = null;
       closePanel();
-      experienceItems.forEach(item => {
+      list.querySelectorAll<HTMLElement>('[data-experience]').forEach(item => {
         item.classList.remove('is-expanded', 'is-active');
         const accordion = item.querySelector('.experience-accordion');
         if (accordion) accordion.remove();
@@ -183,53 +236,14 @@ export function initExperiencePanel(): () => void {
     }
   };
 
-  experienceItems.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-      if (isDesktop) {
-        isHoveringAnyItem = true;
-        clearHideTimeout();
-        if (!pinnedItem) {
-          showPanel(item);
-        }
-      }
-    });
-
-    item.addEventListener('mouseleave', () => {
-      if (isDesktop) {
-        isHoveringAnyItem = false;
-        scheduleHidePanel();
-      }
-    });
-
-    item.addEventListener('click', () => {
-      if (isDesktop) {
-        pinPanel(item);
-      } else {
-        toggleAccordion(item);
-      }
-    });
-  });
-
-  closeBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closePanel();
-  });
-
-  panel.addEventListener('mouseenter', () => {
-    if (isDesktop) {
-      clearHideTimeout();
-    }
-  });
-
-  panel.addEventListener('mouseleave', () => {
-    if (isDesktop && !pinnedItem) {
-      scheduleHidePanel();
-    }
-  });
-
   window.addEventListener('resize', handleResize);
 
   return () => {
+    list.removeEventListener('mouseover', onMouseover);
+    list.removeEventListener('mouseleave', onMouseleave);
+    list.removeEventListener('click', onClick);
+    panel.removeEventListener('mouseenter', onPanelEnter);
+    panel.removeEventListener('mouseleave', onPanelLeave);
     window.removeEventListener('resize', handleResize);
   };
 }
