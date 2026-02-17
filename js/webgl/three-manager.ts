@@ -116,6 +116,9 @@ export class ThreeManager {
   // Resolution for uniforms
   resolution: THREE.Vector2;
 
+  // Canvas resize observer
+  private resizeObserver: ResizeObserver;
+
   constructor(config: ThreeManagerConfig) {
     this.canvas = config.canvas;
     this.isMobile = config.isMobile;
@@ -171,6 +174,10 @@ export class ThreeManager {
 
     // Initial resize
     this.resize();
+
+    // Observe CSS-driven size changes (dvh shifts, orientation, window resize)
+    this.resizeObserver = new ResizeObserver(() => this.resize());
+    this.resizeObserver.observe(this.canvas);
   }
 
   /**
@@ -505,17 +512,12 @@ export class ThreeManager {
    */
   resize(): void {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    if (width === 0 || height === 0) return;
 
-    // Update canvas size
-    this.canvas.width = width * dpr;
-    this.canvas.height = height * dpr;
-    this.canvas.style.width = width + 'px';
-    this.canvas.style.height = height + 'px';
-
-    // Update renderer size
-    this.renderer.setSize(width, height);
+    // Update renderer & pixel ratio (false = don't set inline styles)
+    this.renderer.setSize(width, height, false);
     this.renderer.setPixelRatio(dpr);
 
     // Update composer size
@@ -633,7 +635,8 @@ export class ThreeManager {
       (this.watercolorPass.material as THREE.Material).dispose();
     }
 
-    // Composer and renderer
+    // Observer, composer, and renderer
+    this.resizeObserver.disconnect();
     this.composer.dispose();
     this.renderer.dispose();
   }

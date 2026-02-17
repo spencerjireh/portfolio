@@ -89,11 +89,6 @@ class Portfolio {
     const chatDispose = initChatWidget();
 
     this.disposers.push(navDispose, revealDispose, expDispose, skillsDispose, chatDispose);
-
-    // Window resize for WebGL
-    const onResize = () => this.threeManager?.resize();
-    window.addEventListener('resize', onResize);
-    this.disposers.push(() => window.removeEventListener('resize', onResize));
   }
 
   initWebGL(isMobile: boolean): void {
