@@ -15,6 +15,13 @@ const MAX_MESSAGES = 100;
 const GREETING =
   "Hello! I'm Folionaut, Spencer's AI assistant. I can tell you about his experience, projects, tech stack, and more. What would you like to know?";
 
+const MOBILE_BREAKPOINT = 640;
+const SWIPE_THRESHOLD = 80;
+
+function isMobile(): boolean {
+  return window.innerWidth < MOBILE_BREAKPOINT;
+}
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -84,6 +91,9 @@ export function initChatWidget(): () => void {
   let rateLimitedUntil = 0;
   let rateLimitTimer: ReturnType<typeof setInterval> | null = null;
   let hasGreeted = messages.length > 0;
+  let vpResizeHandler: (() => void) | null = null;
+  let touchStartY = 0;
+  let wasMobile = isMobile();
 
   // ---- DOM creation ----
   const fab = document.createElement('button');
@@ -222,10 +232,10 @@ export function initChatWidget(): () => void {
 
     fab.classList.add('active');
 
-    if (window.innerWidth < 640) {
-      // Mobile: hide FAB, lock body scroll
+    if (isMobile()) {
       fab.classList.add('is-hidden');
       document.body.style.overflow = 'hidden';
+      bindVisualViewport();
     }
 
     // Greeting on first open
@@ -239,13 +249,37 @@ export function initChatWidget(): () => void {
     textarea.focus();
   }
 
+  function bindVisualViewport(): void {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    vpResizeHandler = () => {
+      panel.style.height = `${vv.height}px`;
+      panel.style.top = `${vv.offsetTop}px`;
+    };
+    vv.addEventListener('resize', vpResizeHandler);
+    vv.addEventListener('scroll', vpResizeHandler);
+    vpResizeHandler();
+  }
+
+  function unbindVisualViewport(): void {
+    const vv = window.visualViewport;
+    if (!vv || !vpResizeHandler) return;
+    vv.removeEventListener('resize', vpResizeHandler);
+    vv.removeEventListener('scroll', vpResizeHandler);
+    vpResizeHandler = null;
+    panel.style.height = '';
+    panel.style.top = '';
+  }
+
   function closePanel(): void {
     isOpen = false;
-    panel.classList.remove('is-open');
+    panel.style.transform = '';
+    panel.classList.remove('is-open', 'is-dragging');
     panel.setAttribute('aria-hidden', 'true');
     fab.setAttribute('aria-label', 'Open chat');
     fab.classList.remove('is-hidden');
     fab.classList.remove('active');
+    unbindVisualViewport();
     document.body.style.overflow = '';
   }
 
@@ -372,7 +406,7 @@ export function initChatWidget(): () => void {
   }
 
   function onTextareaKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
       e.preventDefault();
       sendMessage(textarea.value);
     }
@@ -390,9 +424,54 @@ export function initChatWidget(): () => void {
 
   function onDocumentClick(e: MouseEvent): void {
     if (!isOpen) return;
+    if (isMobile()) return;
     const target = e.target as Node;
     if (!panel.contains(target) && !fab.contains(target)) {
       closePanel();
+    }
+  }
+
+  // ---- Swipe-to-dismiss ----
+
+  function onTouchStart(e: TouchEvent): void {
+    touchStartY = e.touches[0].clientY;
+  }
+
+  function onTouchMove(e: TouchEvent): void {
+    const dy = e.touches[0].clientY - touchStartY;
+    if (dy <= 0) return;
+    e.preventDefault();
+    panel.classList.add('is-dragging');
+    panel.style.transform = `translateY(${dy}px)`;
+  }
+
+  function onTouchEnd(e: TouchEvent): void {
+    const dy = Math.max(0, e.changedTouches[0].clientY - touchStartY);
+    panel.classList.remove('is-dragging');
+    if (dy > SWIPE_THRESHOLD) {
+      closePanel();
+    } else {
+      panel.style.transform = '';
+    }
+  }
+
+  // ---- Viewport resize handler ----
+
+  function onWindowResize(): void {
+    const nowMobile = isMobile();
+    if (wasMobile === nowMobile) return;
+    wasMobile = nowMobile;
+
+    if (!isOpen) return;
+
+    if (nowMobile) {
+      fab.classList.add('is-hidden');
+      document.body.style.overflow = 'hidden';
+      bindVisualViewport();
+    } else {
+      fab.classList.remove('is-hidden');
+      document.body.style.overflow = '';
+      unbindVisualViewport();
     }
   }
 
@@ -405,6 +484,10 @@ export function initChatWidget(): () => void {
   textarea.addEventListener('input', onTextareaInput);
   document.addEventListener('keydown', onGlobalKeydown);
   document.addEventListener('click', onDocumentClick);
+  header.addEventListener('touchstart', onTouchStart, { passive: true });
+  header.addEventListener('touchmove', onTouchMove, { passive: false });
+  header.addEventListener('touchend', onTouchEnd);
+  window.addEventListener('resize', onWindowResize);
 
   // ---- Dispose ----
 
@@ -416,6 +499,11 @@ export function initChatWidget(): () => void {
     textarea.removeEventListener('input', onTextareaInput);
     document.removeEventListener('keydown', onGlobalKeydown);
     document.removeEventListener('click', onDocumentClick);
+    header.removeEventListener('touchstart', onTouchStart);
+    header.removeEventListener('touchmove', onTouchMove);
+    header.removeEventListener('touchend', onTouchEnd);
+    window.removeEventListener('resize', onWindowResize);
+    unbindVisualViewport();
     clearRateLimitTimer();
     document.body.style.overflow = '';
     fab.remove();

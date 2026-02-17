@@ -136,7 +136,8 @@
     .chat-panel {
       inset: 0;
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       border: none;
       border-radius: 0;
       transform: translateY(100%);
@@ -149,6 +150,33 @@
     .chat-panel.is-open {
       transform: translateY(0);
     }
+
+    .chat-panel.is-dragging {
+      transition: none;
+    }
+
+    /* Drag handle pill */
+    .chat-header {
+      position: relative;
+      padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+    }
+
+    .chat-header::before {
+      content: '';
+      position: absolute;
+      top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border-default);
+    }
+
+    .chat-input-area {
+      padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    }
+
   }
 
   /* ========================================
@@ -467,6 +495,22 @@
 
   .chat-status--rate-limit {
     color: var(--accent-primary);
+  }
+
+  /* ========================================
+     MOBILE TOUCH TARGETS
+     Must come after base rules to win by source order
+     ======================================== */
+  @media (max-width: 639px) {
+    .chat-close-btn {
+      width: 44px;
+      height: 44px;
+    }
+
+    .chat-send-btn {
+      min-width: 44px;
+      min-height: 44px;
+    }
   }
 
   /* ========================================
