@@ -132,6 +132,8 @@ export class ThreeManager {
       powerPreference: 'low-power',
     });
 
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
     // Detect WebGL version
     const gl = this.renderer.getContext();
     if (gl instanceof WebGL2RenderingContext) {
@@ -511,19 +513,18 @@ export class ThreeManager {
    * Resize renderer and update resolution uniforms
    */
   resize(): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
     if (width === 0 || height === 0) return;
 
-    // Update renderer & pixel ratio (false = don't set inline styles)
+    // Update renderer (false = don't set inline styles, CSS handles sizing)
     this.renderer.setSize(width, height, false);
-    this.renderer.setPixelRatio(dpr);
 
-    // Update composer size
+    // Update composer size (reads renderer's pixelRatio internally)
     this.composer.setSize(width, height);
 
-    // Update resolution
+    // Update resolution uniforms at device-pixel scale
+    const dpr = this.renderer.getPixelRatio();
     this.resolution.set(width * dpr, height * dpr);
 
     // Update all shader uniforms that need resolution
