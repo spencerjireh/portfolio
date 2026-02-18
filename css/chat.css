@@ -345,6 +345,97 @@
     opacity: 0.8;
   }
 
+  /* Headers inside bubbles -- em-based to stay proportional */
+  .chat-message-bubble h1,
+  .chat-message-bubble h2,
+  .chat-message-bubble h3,
+  .chat-message-bubble h4,
+  .chat-message-bubble h5,
+  .chat-message-bubble h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    margin: var(--space-2) 0 var(--space-1);
+  }
+
+  .chat-message-bubble h1 { font-size: 1.2em; }
+  .chat-message-bubble h2 { font-size: 1.15em; }
+  .chat-message-bubble h3 { font-size: 1.1em; }
+  .chat-message-bubble h4 { font-size: 1.05em; }
+  .chat-message-bubble h5,
+  .chat-message-bubble h6 { font-size: 1em; }
+
+  .chat-message-bubble :first-child {
+    margin-top: 0;
+  }
+
+  /* Blockquote */
+  .chat-message-bubble blockquote {
+    margin: var(--space-2) 0;
+    padding: var(--space-1) 0 var(--space-1) var(--space-3);
+    border-left: 2px solid currentColor;
+    opacity: 0.75;
+  }
+
+  .chat-message-bubble blockquote p {
+    margin: 0;
+  }
+
+  /* Horizontal rule */
+  .chat-message-bubble hr {
+    border: none;
+    border-top: 1px solid currentColor;
+    opacity: 0.2;
+    margin: var(--space-2) 0;
+  }
+
+  /* Strikethrough */
+  .chat-message-bubble del {
+    opacity: 0.6;
+  }
+
+  /* Tables */
+  .chat-message-bubble table {
+    display: block;
+    overflow-x: auto;
+    margin: var(--space-2) 0;
+    font-size: 0.85em;
+  }
+
+  .chat-message-bubble th,
+  .chat-message-bubble td {
+    padding: var(--space-1) var(--space-2);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .chat-message-bubble th {
+    font-weight: 600;
+  }
+
+  .chat-message--assistant .chat-message-bubble th,
+  .chat-message--assistant .chat-message-bubble td {
+    border-bottom: 1px solid hsla(30, 10%, 20%, 0.15);
+    border-right: 1px solid hsla(30, 10%, 20%, 0.15);
+  }
+
+  .chat-message--user .chat-message-bubble th,
+  .chat-message--user .chat-message-bubble td {
+    border-bottom: 1px solid hsla(0, 0%, 100%, 0.2);
+    border-right: 1px solid hsla(0, 0%, 100%, 0.2);
+  }
+
+  /* Task list checkboxes (GFM) */
+  .chat-message-bubble .task-list-item {
+    list-style: none;
+    margin-left: calc(-1 * var(--space-4));
+  }
+
+  .chat-message-bubble .task-list-item input[type="checkbox"] {
+    margin-right: var(--space-1);
+    pointer-events: none;
+  }
+
   /* ========================================
      TYPING INDICATOR
      ======================================== */

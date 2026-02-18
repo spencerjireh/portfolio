@@ -10,6 +10,7 @@
     "package": "npm run build && cd dist && tar -czf ../portfolio.tar.gz * && cd .. && echo 'Created portfolio.tar.gz'"
   },
   "dependencies": {
+    "marked": "^17.0.3",
     "three": "^0.170.0"
   },
   "devDependencies": {
