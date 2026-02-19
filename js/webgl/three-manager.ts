@@ -119,6 +119,10 @@ export class ThreeManager {
   // Canvas resize observer
   private resizeObserver: ResizeObserver;
 
+  // Track canvas size for mobile resize filtering (iOS toolbar animation)
+  private lastCanvasWidth: number = 0;
+  private lastCanvasHeight: number = 0;
+
   constructor(config: ThreeManagerConfig) {
     this.canvas = config.canvas;
     this.isMobile = config.isMobile;
@@ -178,7 +182,16 @@ export class ThreeManager {
     this.resize();
 
     // Observe CSS-driven size changes (dvh shifts, orientation, window resize)
-    this.resizeObserver = new ResizeObserver(() => this.resize());
+    // On mobile, skip height-only changes < 150px (iOS toolbar show/hide during scroll)
+    // Width changes always pass through (orientation change)
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.isMobile) {
+        const w = this.canvas.clientWidth;
+        const h = this.canvas.clientHeight;
+        if (w === this.lastCanvasWidth && Math.abs(h - this.lastCanvasHeight) < 150) return;
+      }
+      this.resize();
+    });
     this.resizeObserver.observe(this.canvas);
   }
 
@@ -465,7 +478,7 @@ export class ThreeManager {
         tDiffuse: { value: null },
         tDisplacement: { value: null },
         u_resolution: { value: new THREE.Vector2() },
-        u_kernelSize: { value: this.isMobile ? 4 : 8 },
+        u_kernelSize: { value: 8 },
         u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
         u_revealRadius: { value: 0.15 },
         u_revealSoftness: { value: 0.1 },
@@ -474,7 +487,7 @@ export class ThreeManager {
         u_time: { value: 0.0 },
         u_edgeDarkness: { value: 0.4 },
         u_distortionStrength: { value: 0.06 },
-        u_sampleMode: { value: this.isMobile ? 1 : 0 },
+        u_sampleMode: { value: 0 },
       },
       vertexShader: kuwaharaShader.vertexShader,
       fragmentShader: kuwaharaShader.fragmentShader,
@@ -516,6 +529,10 @@ export class ThreeManager {
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
     if (width === 0 || height === 0) return;
+
+    // Track for mobile resize filtering
+    this.lastCanvasWidth = width;
+    this.lastCanvasHeight = height;
 
     // Update renderer (false = don't set inline styles, CSS handles sizing)
     this.renderer.setSize(width, height, false);

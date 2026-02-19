@@ -50,7 +50,7 @@ Three.js post-processing chain for watercolor effect:
 3. **Watercolor Pass** - Paper texture overlay, Sobel edge darkening, saturation, vignette
 
 Desktop: 8px Kuwahara kernel, ping-pong displacement buffers for water ripple simulation.
-Mobile: 4px kernel, displacement/mouse effects disabled.
+Mobile: 8px kernel (same as desktop, DPR-clamped resolution keeps cost equal), displacement/mouse effects disabled.
 
 ### Painting System
 
