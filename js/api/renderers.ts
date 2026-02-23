@@ -1,6 +1,8 @@
 import type {
   PortfolioBundle,
-  HeroData,
+  BioData,
+  EducationData,
+  LinkData,
   ExperienceData,
   SkillData,
   ProjectData,
@@ -40,24 +42,28 @@ function escUrl(url: string): string {
 
 // ── Hero ──
 
-function renderHero(data: HeroData): void {
-  const name = document.querySelector('.hero-name');
-  const title = document.querySelector('.hero-title');
-  const blurb = document.querySelector('.hero-blurb');
-  const links = document.querySelector('.hero-links');
-  if (!name || !title || !blurb || !links) return;
+function renderHero(bio: BioData, education: EducationData, links: LinkData): void {
+  const nameEl = document.querySelector('.hero-name');
+  const titleEl = document.querySelector('.hero-title');
+  const blurbEl = document.querySelector('.hero-blurb');
+  const linksEl = document.querySelector('.hero-links');
+  if (!nameEl || !titleEl || !blurbEl || !linksEl) return;
 
-  name.innerHTML = `${esc(data.name)} <span class="hero-name-last">${esc(data.lastName)}</span>`;
-  title.textContent = data.title;
-  blurb.innerHTML = data.blurb.map(p => `<p>${safeInline(p)}</p>`).join('');
-  links.innerHTML = [
-    `<a href="${escUrl(data.links.github)}" target="_blank" rel="noopener noreferrer">github</a>`,
+  nameEl.innerHTML = `${esc(bio.name)} <span class="hero-name-last">${esc(bio.lastName)}</span>`;
+  titleEl.textContent = bio.title;
+
+  const eduLine = `<strong>${esc(education.degree)}</strong>, <em>${esc(education.institution)}</em> (${esc(education.year)}).`;
+  const paragraphs = [...bio.blurb.map(p => `<p>${safeInline(p)}</p>`), `<p>${eduLine}</p>`];
+  blurbEl.innerHTML = paragraphs.join('');
+
+  linksEl.innerHTML = [
+    `<a href="${escUrl(links.github)}" target="_blank" rel="noopener noreferrer">github</a>`,
     `<span class="hero-links-separator">/</span>`,
-    `<a href="${escUrl(data.links.linkedin)}" target="_blank" rel="noopener noreferrer">linkedin</a>`,
+    `<a href="${escUrl(links.linkedin)}" target="_blank" rel="noopener noreferrer">linkedin</a>`,
     `<span class="hero-links-separator">/</span>`,
-    `<a href="${escUrl(data.links.resumePath)}" target="_blank" rel="noopener noreferrer">resume</a>`,
+    `<a href="${escUrl(links.resumePath)}" target="_blank" rel="noopener noreferrer">resume</a>`,
     `<span class="hero-links-separator">/</span>`,
-    `<button type="button" class="hero-email-btn" data-copy-email="${esc(data.links.email)}">${esc(data.links.email)}</button>`,
+    `<button type="button" class="hero-email-btn" data-copy-email="${esc(links.email)}">${esc(links.email)}</button>`,
   ].join('\n');
 }
 
@@ -313,9 +319,11 @@ function renderContact(data: ContactData): void {
 // ── Public API ──
 
 export function renderAllContent(bundle: PortfolioBundle): void {
-  if (bundle.hero.length) renderHero(bundle.hero[0].data);
+  if (bundle.bio.length && bundle.education.length && bundle.link.length)
+    renderHero(bundle.bio[0].data, bundle.education[0].data, bundle.link[0].data);
   if (bundle.experience.length) renderExperiences(bundle.experience);
   if (bundle.skill.length) renderSkills(bundle.skill);
+  // hobby: chat-only content, not rendered on frontend
   if (bundle.project.length) renderProjects(bundle.project);
   if (bundle.contact.length) renderContact(bundle.contact[0].data);
 }

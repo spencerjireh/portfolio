@@ -7,9 +7,9 @@ export interface SeedItem {
 }
 
 export const seedItems: SeedItem[] = [
-  // ── Hero ──
+  // ── Bio ──
   {
-    type: 'hero',
+    type: 'bio',
     slug: 'main',
     data: {
       name: 'Spencer Jireh',
@@ -17,15 +17,35 @@ export const seedItems: SeedItem[] = [
       title: 'Software Engineer',
       blurb: [
         'Backend-leaning software engineer building at the intersection of <strong>full-stack development</strong> and <strong>applied AI</strong>.',
-        'I build products end-to-end -- from backend architecture and infrastructure to frontend -- and integrate AI/ML where it makes the work better. Interested in agentic AI, financial systems, distributed systems, and self-hosting.',
-        '<strong>BS Computer Science</strong>, <em>Mapua University</em> (2025).',
+        'I build products end-to-end, from backend architecture and infrastructure to frontend, and integrate AI/ML where it makes the work better. Interested in agentic AI, financial systems, distributed systems, and self-hosting.',
       ],
-      links: {
-        github: 'https://github.com/spencerjireh',
-        linkedin: 'https://www.linkedin.com/in/spencerjireh',
-        resumePath: '/Spencer_Jireh_Cebrian_CV.pdf',
-        email: 'spencercebrian123@gmail.com',
-      },
+    },
+    status: 'published',
+    sortOrder: 0,
+  },
+
+  // ── Education ──
+  {
+    type: 'education',
+    slug: 'bs-cs',
+    data: {
+      degree: 'BS Computer Science',
+      institution: 'Mapua University',
+      year: '2025',
+    },
+    status: 'published',
+    sortOrder: 0,
+  },
+
+  // ── Link ──
+  {
+    type: 'link',
+    slug: 'main',
+    data: {
+      github: 'https://github.com/spencerjireh',
+      linkedin: 'https://www.linkedin.com/in/spencerjireh',
+      resumePath: '/Spencer_Jireh_Cebrian_CV.pdf',
+      email: 'spencercebrian123@gmail.com',
     },
     status: 'published',
     sortOrder: 0,
@@ -114,9 +134,9 @@ export const seedItems: SeedItem[] = [
   },
   {
     type: 'skill',
-    slug: 'typescript',
+    slug: 'javascript-typescript',
     data: {
-      name: 'TypeScript',
+      name: 'JavaScript/TypeScript',
       context:
         '2+ years. React/Next.js frontends, Node.js services. Strict typing advocate.',
       tier: 'primary',
@@ -171,8 +191,6 @@ export const seedItems: SeedItem[] = [
     status: 'published',
     sortOrder: 5,
   },
-
-  // ── Skills - Extended ──
   {
     type: 'skill',
     slug: 'nextjs',
@@ -180,11 +198,13 @@ export const seedItems: SeedItem[] = [
       name: 'Next.js',
       context:
         'App Router, SSR/SSG, API routes. Current frontend framework of choice.',
-      tier: 'extended',
+      tier: 'primary',
     },
     status: 'published',
     sortOrder: 6,
   },
+
+  // ── Skills - Extended ──
   {
     type: 'skill',
     slug: 'nodejs',
@@ -244,6 +264,42 @@ export const seedItems: SeedItem[] = [
     status: 'published',
     sortOrder: 11,
   },
+  {
+    type: 'skill',
+    slug: 'express',
+    data: {
+      name: 'Express',
+      context:
+        'Node.js web framework. Used in Folionaut CMS and backend services at Stratpoint.',
+      tier: 'extended',
+    },
+    status: 'published',
+    sortOrder: 12,
+  },
+  {
+    type: 'skill',
+    slug: 'langgraph',
+    data: {
+      name: 'LangGraph',
+      context:
+        'Agentic AI workflows. Built Arxivian\'s multi-tool agent with parallel execution and retry loops.',
+      tier: 'extended',
+    },
+    status: 'published',
+    sortOrder: 13,
+  },
+  {
+    type: 'skill',
+    slug: 'java',
+    data: {
+      name: 'Java',
+      context:
+        'Backend development during Stratpoint internship. Spring ecosystem.',
+      tier: 'extended',
+    },
+    status: 'published',
+    sortOrder: 14,
+  },
 
   // ── Skills - Familiar ──
   {
@@ -256,7 +312,7 @@ export const seedItems: SeedItem[] = [
       tier: 'familiar',
     },
     status: 'published',
-    sortOrder: 12,
+    sortOrder: 15,
   },
   {
     type: 'skill',
@@ -268,19 +324,7 @@ export const seedItems: SeedItem[] = [
       tier: 'familiar',
     },
     status: 'published',
-    sortOrder: 13,
-  },
-  {
-    type: 'skill',
-    slug: 'java',
-    data: {
-      name: 'Java',
-      context:
-        'Backend development during Stratpoint internship. Spring ecosystem.',
-      tier: 'familiar',
-    },
-    status: 'published',
-    sortOrder: 14,
+    sortOrder: 16,
   },
   {
     type: 'skill',
@@ -291,7 +335,7 @@ export const seedItems: SeedItem[] = [
       tier: 'familiar',
     },
     status: 'published',
-    sortOrder: 15,
+    sortOrder: 17,
   },
   {
     type: 'skill',
@@ -303,7 +347,7 @@ export const seedItems: SeedItem[] = [
       tier: 'familiar',
     },
     status: 'published',
-    sortOrder: 16,
+    sortOrder: 18,
   },
   {
     type: 'skill',
@@ -314,7 +358,61 @@ export const seedItems: SeedItem[] = [
       tier: 'familiar',
     },
     status: 'published',
-    sortOrder: 17,
+    sortOrder: 19,
+  },
+  {
+    type: 'skill',
+    slug: 'scikit-learn',
+    data: {
+      name: 'Scikit-learn',
+      context:
+        'ML model training and evaluation. Logistic Regression for CytoLens breast cancer predictor.',
+      tier: 'familiar',
+    },
+    status: 'published',
+    sortOrder: 20,
+  },
+
+  // ── Hobbies (chat-only, not rendered on frontend) ──
+  {
+    type: 'hobby',
+    slug: 'reading',
+    data: {
+      name: 'Reading',
+      description: 'Avid reader across fiction, non-fiction, and manga',
+    },
+    status: 'published',
+    sortOrder: 0,
+  },
+  {
+    type: 'hobby',
+    slug: 'chess',
+    data: {
+      name: 'Chess',
+      description: 'Plays casually online',
+    },
+    status: 'published',
+    sortOrder: 1,
+  },
+  {
+    type: 'hobby',
+    slug: 'tv-and-animation',
+    data: {
+      name: 'TV and animated series',
+      description: 'Watches a broad mix of live-action and animation',
+    },
+    status: 'published',
+    sortOrder: 2,
+  },
+  {
+    type: 'hobby',
+    slug: 'music-production',
+    data: {
+      name: 'Music production',
+      description: 'Produces beats/hip-hop and lo-fi/chill using FL Studio',
+    },
+    status: 'published',
+    sortOrder: 3,
   },
 
   // ── Projects ──

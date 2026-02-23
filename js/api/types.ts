@@ -1,14 +1,21 @@
-export interface HeroData {
+export interface BioData {
   name: string;
   lastName: string;
   title: string;
   blurb: string[];
-  links: {
-    github: string;
-    linkedin: string;
-    resumePath: string;
-    email: string;
-  };
+}
+
+export interface EducationData {
+  degree: string;
+  institution: string;
+  year: string;
+}
+
+export interface LinkData {
+  github: string;
+  linkedin: string;
+  resumePath: string;
+  email: string;
 }
 
 export interface ExperienceData {
@@ -42,6 +49,11 @@ export interface ProjectData {
   highlights: string[];
 }
 
+export interface HobbyData {
+  name: string;
+  description: string;
+}
+
 export interface ContactData {
   title: string;
   subtitle: string;
@@ -64,9 +76,12 @@ export interface ContentRow<T = unknown> {
 }
 
 export interface PortfolioBundle {
-  hero: ContentRow<HeroData>[];
+  bio: ContentRow<BioData>[];
+  education: ContentRow<EducationData>[];
+  link: ContentRow<LinkData>[];
   experience: ContentRow<ExperienceData>[];
   skill: ContentRow<SkillData>[];
+  hobby: ContentRow<HobbyData>[];
   project: ContentRow<ProjectData>[];
   contact: ContentRow<ContactData>[];
 }

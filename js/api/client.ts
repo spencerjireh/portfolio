@@ -62,9 +62,12 @@ function normalizeBundleResponse(data: Record<string, unknown[]>): PortfolioBund
     [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return {
-    hero: sortByOrder(data.hero as PortfolioBundle['hero'] ?? []),
+    bio: sortByOrder(data.bio as PortfolioBundle['bio'] ?? []),
+    education: sortByOrder(data.education as PortfolioBundle['education'] ?? []),
+    link: sortByOrder(data.link as PortfolioBundle['link'] ?? []),
     experience: sortByOrder(data.experience as PortfolioBundle['experience'] ?? []),
     skill: sortByOrder(data.skill as PortfolioBundle['skill'] ?? []),
+    hobby: sortByOrder(data.hobby as PortfolioBundle['hobby'] ?? []),
     project: sortByOrder(data.project as PortfolioBundle['project'] ?? []),
     contact: sortByOrder(data.contact as PortfolioBundle['contact'] ?? []),
   };
