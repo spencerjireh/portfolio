@@ -25,6 +25,7 @@ function safeInline(s: string): string {
   let out = esc(s);
   out = out.replace(/&lt;(\/?)strong&gt;/g, '<$1strong>');
   out = out.replace(/&lt;(\/?)em&gt;/g, '<$1em>');
+  out = out.replace(/&lt;(\/?)sup&gt;/g, '<$1sup>');
   out = out.replace(
     /&lt;a href=&quot;(https?:\/\/[^&]*(?:&amp;[^&]*)*)&quot;&gt;(.+?)&lt;\/a&gt;/g,
     (_, url, text) => `<a href="${url.replace(/&amp;/g, '&')}" target="_blank" rel="noopener noreferrer">${text}</a>`,
@@ -186,11 +187,11 @@ function renderProjects(items: ContentRow<ProjectData>[]): void {
     }
 
     metaHtml += `\n        <div class="project-meta-links">
-          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)} ${LINK_ICON}</a>`).join('\n          ')}
+          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)} ${LINK_ICON}</a>`).join('\n          ')}
         </div>`;
 
     if (data.metaNote) {
-      metaHtml += `\n        <p class="project-meta-note">${esc(data.metaNote)}</p>`;
+      metaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
     }
 
     // Mobile meta
@@ -199,11 +200,11 @@ function renderProjects(items: ContentRow<ProjectData>[]): void {
           <p class="project-meta-value">${esc(data.techStackMobile)}</p>
         </div>
         <div class="project-meta-mobile-links">
-          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${esc(l.label)}</a>`).join('\n          ')}
+          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)}</a>`).join('\n          ')}
         </div>`;
 
     if (data.metaNote) {
-      mobileMetaHtml += `\n        <p class="project-meta-note">${esc(data.metaNote)}</p>`;
+      mobileMetaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
     }
 
     // Article content
