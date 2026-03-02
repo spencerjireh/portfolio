@@ -436,6 +436,10 @@ export const seedItems: SeedItem[] = [
           label: 'GitHub',
           url: 'https://github.com/spencerjireh/arxivian',
         },
+        {
+          label: 'Live Site',
+          url: 'https://arxivian.spencerjireh.com',
+        },
       ],
       descriptions: [
         'An agentic RAG system for academic research. Chat with an AI agent that searches, ingests, summarizes, and explores citations across arXiv papers through a conversational interface backed by a LangGraph workflow and hybrid retrieval.',

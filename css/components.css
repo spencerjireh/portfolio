@@ -1629,6 +1629,11 @@
     flex: 1;
   }
 
+  /* Teaser: mobile-only, hidden on desktop */
+  .project-teaser {
+    display: none;
+  }
+
   .project-description {
     font-family: var(--font-serif);
     font-size: var(--text-base);

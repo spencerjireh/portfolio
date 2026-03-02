@@ -208,7 +208,8 @@ function renderProjects(items: ContentRow<ProjectData>[]): void {
     }
 
     // Article content
-    const descriptionsHtml = data.descriptions
+    const teaserHtml = `<p class="project-teaser">${esc(data.descriptions[0])}</p>`;
+    const descriptionsHtml = data.descriptions.slice(1)
       .map(d => `<p class="project-description">${esc(d)}</p>`)
       .join('\n        ');
 
@@ -231,6 +232,7 @@ function renderProjects(items: ContentRow<ProjectData>[]): void {
           ${data.tags.map(t => `<span class="project-tag">${esc(t)}</span>`).join('\n          ')}
         </div>
       </header>
+      ${teaserHtml}
       <div class="project-meta-mobile">
         ${mobileMetaHtml}
       </div>
