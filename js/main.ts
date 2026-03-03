@@ -58,8 +58,7 @@ class Portfolio {
       }
     }
 
-    // Start content fetch in parallel with asset loading (fire-and-forget)
-    loadContent().then(bundle => {
+    const contentReady = loadContent().then(bundle => {
       try {
         if (bundle) renderAllContent(bundle);
       } catch (e) {
@@ -67,7 +66,7 @@ class Portfolio {
       }
     });
 
-    await loadingManager.waitForAssets(this.threeManager);
+    await loadingManager.waitForAssets(this.threeManager, contentReady);
     loadingManager.reveal();
 
     this.threeManager?.loadRemainingPaintings();

@@ -73,10 +73,11 @@ export class LoadingManager {
     this.mobileWarningBtn.addEventListener('click', handleDismiss);
   }
 
-  async waitForAssets(threeManager: ThreeManager | null): Promise<void> {
+  async waitForAssets(threeManager: ThreeManager | null, ...extras: Promise<unknown>[]): Promise<void> {
     const promises: Promise<unknown>[] = [
       document.fonts.ready,
       this.waitForFirstFrame(),
+      ...extras,
     ];
 
     if (threeManager) {
