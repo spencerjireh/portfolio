@@ -74,20 +74,13 @@ export class LoadingManager {
   }
 
   async waitForAssets(threeManager: ThreeManager | null, ...extras: Promise<unknown>[]): Promise<void> {
-    const promises: Promise<unknown>[] = [
-      document.fonts.ready,
-      this.waitForFirstFrame(),
-      ...extras,
-    ];
+    const promises: Promise<unknown>[] = [document.fonts.ready, this.waitForFirstFrame(), ...extras];
 
     if (threeManager) {
       promises.push(threeManager.paintingsLoaded);
     }
 
-    await Promise.race([
-      Promise.all(promises),
-      this.timeoutPromise(),
-    ]);
+    await Promise.race([Promise.all(promises), this.timeoutPromise()]);
 
     await this.ensureMinDisplayTime();
   }

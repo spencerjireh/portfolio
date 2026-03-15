@@ -10,7 +10,7 @@ export function initProjectNavigation(): () => void {
   const ac = new AbortController();
 
   const setActiveProject = (projectNum: string | null): void => {
-    sideNavItems?.forEach(item => {
+    sideNavItems?.forEach((item) => {
       const target = item.getAttribute('data-nav-target');
       if (target === projectNum) {
         item.classList.add('is-active');
@@ -19,7 +19,7 @@ export function initProjectNavigation(): () => void {
       }
     });
 
-    dotButtons?.forEach(dot => {
+    dotButtons?.forEach((dot) => {
       const target = dot.getAttribute('data-dot-target');
       if (target === projectNum) {
         dot.classList.add('is-active');
@@ -39,74 +39,88 @@ export function initProjectNavigation(): () => void {
     }
   };
 
-  const projectObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const projectNum = entry.target.getAttribute('data-project-section');
-        if (projectNum) {
-          setActiveProject(projectNum);
-          setNavVisibility(true);
+  const projectObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const projectNum = entry.target.getAttribute('data-project-section');
+          if (projectNum) {
+            setActiveProject(projectNum);
+            setNavVisibility(true);
+          }
         }
-      }
-    });
-  }, {
-    root: null,
-    rootMargin: '-50% 0px -50% 0px',
-    threshold: 0
-  });
+      });
+    },
+    {
+      root: null,
+      rootMargin: '-50% 0px -50% 0px',
+      threshold: 0,
+    },
+  );
 
   const hideNavSections = [
     document.getElementById('hero'),
     document.getElementById('experience'),
     document.getElementById('skills'),
     document.getElementById('projects-index'),
-    document.getElementById('contact')
+    document.getElementById('contact'),
   ].filter(Boolean) as HTMLElement[];
 
-  const hideNavObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        setNavVisibility(false);
-        setActiveProject(null);
-      }
-    });
-  }, {
-    root: null,
-    rootMargin: '-50% 0px -50% 0px',
-    threshold: 0
-  });
-
-  projectSections.forEach(section => projectObserver.observe(section));
-  hideNavSections.forEach(section => hideNavObserver.observe(section));
-
-  sideNavItems?.forEach(item => {
-    item.addEventListener('click', (e: MouseEvent) => {
-      e.preventDefault();
-      const target = item.getAttribute('data-nav-target');
-      const section = document.querySelector(`[data-project-section="${target}"]`);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, { signal: ac.signal });
-  });
-
-  dotButtons?.forEach(dot => {
-    dot.addEventListener('click', () => {
-      const target = dot.getAttribute('data-dot-target');
-      const section = document.querySelector(`[data-project-section="${target}"]`);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        if (window.innerWidth < 1024) {
-          setTimeout(() => {
-            const projectArticle = section.querySelector<HTMLElement>('[data-project-article]');
-            if (projectArticle && !projectArticle.classList.contains('is-expanded')) {
-              projectArticle.click();
-            }
-          }, 400);
+  const hideNavObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setNavVisibility(false);
+          setActiveProject(null);
         }
-      }
-    }, { signal: ac.signal });
+      });
+    },
+    {
+      root: null,
+      rootMargin: '-50% 0px -50% 0px',
+      threshold: 0,
+    },
+  );
+
+  for (const section of projectSections) projectObserver.observe(section);
+  for (const section of hideNavSections) hideNavObserver.observe(section);
+
+  sideNavItems?.forEach((item) => {
+    item.addEventListener(
+      'click',
+      (e: MouseEvent) => {
+        e.preventDefault();
+        const target = item.getAttribute('data-nav-target');
+        const section = document.querySelector(`[data-project-section="${target}"]`);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      },
+      { signal: ac.signal },
+    );
+  });
+
+  dotButtons?.forEach((dot) => {
+    dot.addEventListener(
+      'click',
+      () => {
+        const target = dot.getAttribute('data-dot-target');
+        const section = document.querySelector(`[data-project-section="${target}"]`);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          if (window.innerWidth < 1024) {
+            setTimeout(() => {
+              const projectArticle = section.querySelector<HTMLElement>('[data-project-article]');
+              if (projectArticle && !projectArticle.classList.contains('is-expanded')) {
+                projectArticle.click();
+              }
+            }, 400);
+          }
+        }
+      },
+      { signal: ac.signal },
+    );
   });
 
   return () => {

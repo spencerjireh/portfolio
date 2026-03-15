@@ -13,16 +13,16 @@ export const displacementShader = {
     u_mouse: { value: null },
     u_prevMouse: { value: null },
     u_brushSize: { value: 0.035 },
-    u_expandRate: { value: 0.4 },      // How fast displacement spreads outward
-    u_fillRate: { value: 0.08 },       // How fast edges fill in (slower than expand)
-    u_waveSpeed: { value: 0.2 },       // Wave propagation speed (c²)
-    u_waveDamping: { value: 0.95 },    // Wave energy decay per frame
+    u_expandRate: { value: 0.4 }, // How fast displacement spreads outward
+    u_fillRate: { value: 0.08 }, // How fast edges fill in (slower than expand)
+    u_waveSpeed: { value: 0.2 }, // Wave propagation speed (c²)
+    u_waveDamping: { value: 0.95 }, // Wave energy decay per frame
     u_isActive: { value: 0.0 },
-    u_moveIntensity: { value: 0.0 },   // Smoothed mouse movement (0-1)
+    u_moveIntensity: { value: 0.0 }, // Smoothed mouse movement (0-1)
     u_resolution: { value: null },
     u_texelSize: { value: null },
     u_time: { value: 0.0 },
-    u_imageAspect: { value: 1.0 },     // Image aspect ratio for coordinate alignment
+    u_imageAspect: { value: 1.0 }, // Image aspect ratio for coordinate alignment
   },
 
   vertexShader: /* glsl */ `

@@ -2,22 +2,26 @@ export function initCopyEmail(): () => void {
   const emailBtns = document.querySelectorAll<HTMLButtonElement>('[data-copy-email]');
   const ac = new AbortController();
 
-  emailBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const email = btn.getAttribute('data-copy-email');
-      if (!email) return;
+  emailBtns.forEach((btn) => {
+    btn.addEventListener(
+      'click',
+      async () => {
+        const email = btn.getAttribute('data-copy-email');
+        if (!email) return;
 
-      try {
-        await navigator.clipboard.writeText(email);
-        btn.classList.add('copied');
+        try {
+          await navigator.clipboard.writeText(email);
+          btn.classList.add('copied');
 
-        setTimeout(() => {
-          btn.classList.remove('copied');
-        }, 1500);
-      } catch (err) {
-        console.warn('Clipboard API failed, using fallback');
-      }
-    }, { signal: ac.signal });
+          setTimeout(() => {
+            btn.classList.remove('copied');
+          }, 1500);
+        } catch (_err) {
+          console.warn('Clipboard API failed, using fallback');
+        }
+      },
+      { signal: ac.signal },
+    );
   });
 
   return () => ac.abort();

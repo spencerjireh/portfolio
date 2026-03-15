@@ -6,14 +6,15 @@ export function initSkillsInteraction(): () => void {
   const ac = new AbortController();
 
   const collapseAll = (): void => {
-    container.querySelectorAll<HTMLButtonElement>('[data-skill].is-expanded')
-      .forEach(item => item.classList.remove('is-expanded'));
+    container.querySelectorAll<HTMLButtonElement>('[data-skill].is-expanded').forEach((item) => {
+      item.classList.remove('is-expanded');
+    });
   };
 
   const toggleExpansion = (item: HTMLButtonElement): void => {
     const isExpanded = item.classList.contains('is-expanded');
 
-    container.querySelectorAll<HTMLButtonElement>('[data-skill]').forEach(other => {
+    container.querySelectorAll<HTMLButtonElement>('[data-skill]').forEach((other) => {
       if (other !== item) other.classList.remove('is-expanded');
     });
 

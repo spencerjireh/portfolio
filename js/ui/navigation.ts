@@ -27,28 +27,40 @@ export function initNavigation(deps: NavigationDeps): () => void {
     menuTrigger.classList.remove('active');
   };
 
-  menuTrigger.addEventListener('click', (e: Event) => {
-    e.stopPropagation();
-    const isActive = dropdownMenu.classList.contains('active');
-    if (isActive) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  }, { signal: ac.signal });
+  menuTrigger.addEventListener(
+    'click',
+    (e: Event) => {
+      e.stopPropagation();
+      const isActive = dropdownMenu.classList.contains('active');
+      if (isActive) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    },
+    { signal: ac.signal },
+  );
 
-  dropdownLinks?.forEach(link => {
+  dropdownLinks?.forEach((link) => {
     if (link.hasAttribute('data-change-painting')) return;
-    link.addEventListener('click', () => {
-      closeMenu();
-    }, { signal: ac.signal });
+    link.addEventListener(
+      'click',
+      () => {
+        closeMenu();
+      },
+      { signal: ac.signal },
+    );
   });
 
-  changePaintingBtn?.addEventListener('click', () => {
-    if (!deps.sceneController || deps.isMobile) return;
-    if (deps.sceneController.isWashTransitioning) return;
-    deps.sceneController.triggerNextPainting();
-  }, { signal: ac.signal });
+  changePaintingBtn?.addEventListener(
+    'click',
+    () => {
+      if (!deps.sceneController || deps.isMobile) return;
+      if (deps.sceneController.isWashTransitioning) return;
+      deps.sceneController.triggerNextPainting();
+    },
+    { signal: ac.signal },
+  );
 
   const escapeHandler = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && dropdownMenu.classList.contains('active')) {

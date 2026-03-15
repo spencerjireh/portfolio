@@ -1,8 +1,5 @@
+import { API_BASE } from './config';
 import type { PortfolioBundle } from './types';
-
-const API_BASE = import.meta.env.DEV
-  ? '/api/v1'
-  : 'https://folionaut.spencerjireh.com/api/v1';
 
 const ETAG_KEY = 'portfolio-api-etag';
 
@@ -22,9 +19,7 @@ function storeETag(etag: string): void {
   }
 }
 
-export async function fetchBundle(
-  useEtag = true,
-): Promise<{ bundle: PortfolioBundle | null; notModified: boolean }> {
+export async function fetchBundle(useEtag = true): Promise<{ bundle: PortfolioBundle | null; notModified: boolean }> {
   const headers: Record<string, string> = {};
   if (useEtag) {
     const etag = getStoredETag();
@@ -62,13 +57,13 @@ function normalizeBundleResponse(data: Record<string, unknown[]>): PortfolioBund
     [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return {
-    bio: sortByOrder(data.bio as PortfolioBundle['bio'] ?? []),
-    education: sortByOrder(data.education as PortfolioBundle['education'] ?? []),
-    link: sortByOrder(data.link as PortfolioBundle['link'] ?? []),
-    experience: sortByOrder(data.experience as PortfolioBundle['experience'] ?? []),
-    skill: sortByOrder(data.skill as PortfolioBundle['skill'] ?? []),
-    hobby: sortByOrder(data.hobby as PortfolioBundle['hobby'] ?? []),
-    project: sortByOrder(data.project as PortfolioBundle['project'] ?? []),
-    contact: sortByOrder(data.contact as PortfolioBundle['contact'] ?? []),
+    bio: sortByOrder((data.bio as PortfolioBundle['bio']) ?? []),
+    education: sortByOrder((data.education as PortfolioBundle['education']) ?? []),
+    link: sortByOrder((data.link as PortfolioBundle['link']) ?? []),
+    experience: sortByOrder((data.experience as PortfolioBundle['experience']) ?? []),
+    skill: sortByOrder((data.skill as PortfolioBundle['skill']) ?? []),
+    hobby: sortByOrder((data.hobby as PortfolioBundle['hobby']) ?? []),
+    project: sortByOrder((data.project as PortfolioBundle['project']) ?? []),
+    contact: sortByOrder((data.contact as PortfolioBundle['contact']) ?? []),
   };
 }

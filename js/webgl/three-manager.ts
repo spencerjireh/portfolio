@@ -7,11 +7,10 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-
-import { proceduralGradientShader } from './shaders/procedural-gradient';
-import { kuwaharaShader } from './shaders/kuwahara';
-import { watercolorEnhanceShader, generatePaperTexture } from './shaders/watercolor-enhance';
 import { displacementShader } from './shaders/displacement';
+import { kuwaharaShader } from './shaders/kuwahara';
+import { proceduralGradientShader } from './shaders/procedural-gradient';
+import { generatePaperTexture, watercolorEnhanceShader } from './shaders/watercolor-enhance';
 
 interface ThreeManagerConfig {
   canvas: HTMLCanvasElement;
@@ -95,7 +94,7 @@ export class ThreeManager {
   placeholderTexture: THREE.DataTexture;
 
   // Painting textures for idle cycling
-  paintingTextures: (THREE.Texture | null)[] = [null, null, null, null, null, null, null];
+  paintingTextures: (THREE.Texture | null)[] = Array.from({ length: PAINTINGS.length }, () => null);
   currentPaintingIndex: number = 0;
 
   // Promise that resolves when first painting loads (for fast initial render)
@@ -217,7 +216,7 @@ export class ThreeManager {
       width,
       height,
       THREE.RGBAFormat,
-      THREE.UnsignedByteType
+      THREE.UnsignedByteType,
     );
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -279,12 +278,8 @@ export class ThreeManager {
    */
   renderDisplacementPass(): void {
     // Determine source and target
-    const source = this.currentDisplacementTarget === 'A'
-      ? this.displacementTargetA
-      : this.displacementTargetB;
-    const target = this.currentDisplacementTarget === 'A'
-      ? this.displacementTargetB
-      : this.displacementTargetA;
+    const source = this.currentDisplacementTarget === 'A' ? this.displacementTargetA : this.displacementTargetB;
+    const target = this.currentDisplacementTarget === 'A' ? this.displacementTargetB : this.displacementTargetA;
 
     // Set previous frame's state as input
     this.displacementMaterial.uniforms.tPrevState.value = source.texture;
@@ -303,9 +298,7 @@ export class ThreeManager {
    */
   getDisplacementTexture(): THREE.Texture {
     // Return the texture we just rendered to
-    return this.currentDisplacementTarget === 'A'
-      ? this.displacementTargetB.texture
-      : this.displacementTargetA.texture;
+    return this.currentDisplacementTarget === 'A' ? this.displacementTargetB.texture : this.displacementTargetA.texture;
   }
 
   /**
@@ -368,7 +361,7 @@ export class ThreeManager {
             this.noiseMaterial.uniforms.u_useImage.value = 0;
           }
           resolve();
-        }
+        },
       );
     });
   }
@@ -403,7 +396,7 @@ export class ThreeManager {
         undefined,
         (error) => {
           console.warn(`Failed to load painting ${index}:`, error);
-        }
+        },
       );
     });
   }
@@ -625,7 +618,7 @@ export class ThreeManager {
     // Textures
     this.paperTexture.dispose();
     this.placeholderTexture.dispose();
-    this.paintingTextures.forEach(texture => {
+    this.paintingTextures.forEach((texture) => {
       if (texture) texture.dispose();
     });
 

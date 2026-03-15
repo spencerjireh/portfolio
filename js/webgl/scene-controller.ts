@@ -4,7 +4,7 @@
  * Mouse position controls Kuwahara filter reveal
  */
 
-import { ThreeManager, PAINTINGS } from './three-manager';
+import { PAINTINGS, type ThreeManager } from './three-manager';
 
 interface MousePos {
   x: number;
@@ -31,9 +31,9 @@ export class SceneController {
   idleStartTime: number = 0;
   idleCheckInterval: number | null = null;
 
-  // Painting cycle (5 paintings loaded in ThreeManager)
+  // Painting cycle
   currentPaintingIndex: number = 0;
-  totalPaintings: number = 7;
+  totalPaintings: number = PAINTINGS.length;
 
   // Mouse event handler references for cleanup
   private mouseMoveHandler: ((e: MouseEvent) => void) | null = null;
@@ -87,13 +87,17 @@ export class SceneController {
     this.mouseMoveHandler = (e: MouseEvent): void => {
       if (this.threeManager.isMobile) return;
       this.targetMousePos.x = e.clientX / window.innerWidth;
-      this.targetMousePos.y = 1.0 - (e.clientY / window.innerHeight);
+      this.targetMousePos.y = 1.0 - e.clientY / window.innerHeight;
       this.isMouseActive = true;
       onActivity();
     };
 
-    this.mouseEnterHandler = () => { this.isMouseActive = true; };
-    this.mouseLeaveHandler = () => { this.isMouseActive = false; };
+    this.mouseEnterHandler = () => {
+      this.isMouseActive = true;
+    };
+    this.mouseLeaveHandler = () => {
+      this.isMouseActive = false;
+    };
 
     window.addEventListener('mousemove', this.mouseMoveHandler, { passive: true });
     document.addEventListener('mouseenter', this.mouseEnterHandler, { passive: true });
@@ -185,15 +189,17 @@ export class SceneController {
 
     // Dispatch painting change event with metadata
     const painting = PAINTINGS[nextIndex];
-    window.dispatchEvent(new CustomEvent('paintingchange', {
-      detail: {
-        index: nextIndex,
-        title: painting.title,
-        artist: painting.artist,
-        year: painting.year,
-        isTransitioning: true,
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('paintingchange', {
+        detail: {
+          index: nextIndex,
+          title: painting.title,
+          artist: painting.artist,
+          year: painting.year,
+          isTransitioning: true,
+        },
+      }),
+    );
 
     // Reset idle timer for next cycle
     this.idleStartTime = Date.now();
@@ -230,15 +236,17 @@ export class SceneController {
 
     // Dispatch painting change complete event
     const painting = PAINTINGS[this.currentPaintingIndex];
-    window.dispatchEvent(new CustomEvent('paintingchange', {
-      detail: {
-        index: this.currentPaintingIndex,
-        title: painting.title,
-        artist: painting.artist,
-        year: painting.year,
-        isTransitioning: false,
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('paintingchange', {
+        detail: {
+          index: this.currentPaintingIndex,
+          title: painting.title,
+          artist: painting.artist,
+          year: painting.year,
+          isTransitioning: false,
+        },
+      }),
+    );
   }
 
   /**
@@ -289,12 +297,7 @@ export class SceneController {
     this.threeManager.updateMouse(this.mousePos.x, this.mousePos.y);
 
     // Update displacement with mouse position and movement intensity
-    this.threeManager.updateDisplacement(
-      this.mousePos.x,
-      this.mousePos.y,
-      this.isMouseActive,
-      this.moveIntensity
-    );
+    this.threeManager.updateDisplacement(this.mousePos.x, this.mousePos.y, this.isMouseActive, this.moveIntensity);
 
     // Render
     this.threeManager.render();
@@ -311,15 +314,17 @@ export class SceneController {
 
     // Dispatch initial painting info
     const painting = PAINTINGS[this.currentPaintingIndex];
-    window.dispatchEvent(new CustomEvent('paintingchange', {
-      detail: {
-        index: this.currentPaintingIndex,
-        title: painting.title,
-        artist: painting.artist,
-        year: painting.year,
-        isTransitioning: false,
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('paintingchange', {
+        detail: {
+          index: this.currentPaintingIndex,
+          title: painting.title,
+          artist: painting.artist,
+          year: painting.year,
+          isTransitioning: false,
+        },
+      }),
+    );
 
     const animate = (): void => {
       if (!this.isAnimating) return;

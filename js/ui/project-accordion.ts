@@ -8,7 +8,7 @@ export function initProjectAccordion(): () => void {
   const toggleAccordion = (article: HTMLElement): void => {
     const isExpanded = article.classList.contains('is-expanded');
 
-    projectArticles.forEach(other => {
+    projectArticles.forEach((other) => {
       if (other !== article) {
         other.classList.remove('is-expanded');
       }
@@ -25,15 +25,19 @@ export function initProjectAccordion(): () => void {
     }
   };
 
-  projectArticles.forEach(article => {
-    article.addEventListener('click', (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('a')) return;
+  projectArticles.forEach((article) => {
+    article.addEventListener(
+      'click',
+      (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('a')) return;
 
-      if (window.innerWidth >= 1024) return;
+        if (window.innerWidth >= 1024) return;
 
-      toggleAccordion(article);
-    }, { signal: ac.signal });
+        toggleAccordion(article);
+      },
+      { signal: ac.signal },
+    );
   });
 
   return () => ac.abort();

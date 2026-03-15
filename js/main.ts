@@ -5,20 +5,20 @@
 
 import '../css/main.css';
 
-import { ThreeManager } from './webgl/three-manager';
-import { SceneController } from './webgl/scene-controller';
-import { LoadingManager } from './loading-manager';
-import { detectMobile } from './utils';
-import { initNavigation } from './ui/navigation';
-import { initRevealAnimations } from './ui/reveal-animations';
-import { initSmoothScroll } from './ui/smooth-scroll';
-import { initExperiencePanel } from './ui/experience-panel';
-import { initSkillsInteraction } from './ui/skills-interaction';
-import { initPaintingAttribution } from './ui/painting-attribution';
-import { initCopyEmail } from './ui/copy-email';
-import { initChatWidget } from './ui/chat-widget';
 import { loadContent } from './api/content-loader';
 import { renderAllContent } from './api/renderers';
+import { LoadingManager } from './loading-manager';
+import { initChatWidget } from './ui/chat-widget';
+import { initCopyEmail } from './ui/copy-email';
+import { initExperiencePanel } from './ui/experience-panel';
+import { initNavigation } from './ui/navigation';
+import { initPaintingAttribution } from './ui/painting-attribution';
+import { initRevealAnimations } from './ui/reveal-animations';
+import { initSkillsInteraction } from './ui/skills-interaction';
+import { initSmoothScroll } from './ui/smooth-scroll';
+import { detectMobile } from './utils';
+import { SceneController } from './webgl/scene-controller';
+import { ThreeManager } from './webgl/three-manager';
 
 declare global {
   interface Window {
@@ -58,7 +58,7 @@ class Portfolio {
       }
     }
 
-    const contentReady = contentPromise.then(bundle => {
+    const contentReady = contentPromise.then((bundle) => {
       try {
         if (bundle) {
           const contentDisposers = renderAllContent(bundle);
@@ -90,7 +90,16 @@ class Portfolio {
     const emailDispose = initCopyEmail();
     const chatDispose = initChatWidget();
 
-    this.disposers.push(navDispose, revealDispose, scrollDispose, expDispose, skillsDispose, attrDispose, emailDispose, chatDispose);
+    this.disposers.push(
+      navDispose,
+      revealDispose,
+      scrollDispose,
+      expDispose,
+      skillsDispose,
+      attrDispose,
+      emailDispose,
+      chatDispose,
+    );
   }
 
   initWebGL(isMobile: boolean): void {
@@ -128,7 +137,7 @@ class Portfolio {
   }
 
   dispose(): void {
-    this.disposers.forEach(fn => fn());
+    for (const fn of this.disposers) fn();
     this.sceneController?.dispose();
     this.threeManager?.dispose();
   }

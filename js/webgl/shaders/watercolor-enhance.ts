@@ -146,9 +146,7 @@ export const watercolorEnhanceShader = {
  * Generate a procedural paper texture
  * Returns a DataTexture with grayscale noise pattern
  */
-export function generatePaperTexture(
-  size: number = 512
-): { data: Uint8Array; width: number; height: number } {
+export function generatePaperTexture(size: number = 512): { data: Uint8Array; width: number; height: number } {
   const data = new Uint8Array(size * size * 4); // RGBA
 
   // Simple hash function for reproducible noise
@@ -172,10 +170,7 @@ export function generatePaperTexture(
     const ux = fx * fx * (3 - 2 * fx);
     const uy = fy * fy * (3 - 2 * fy);
 
-    return a * (1 - ux) * (1 - uy) +
-           b * ux * (1 - uy) +
-           c * (1 - ux) * uy +
-           d * ux * uy;
+    return a * (1 - ux) * (1 - uy) + b * ux * (1 - uy) + c * (1 - ux) * uy + d * ux * uy;
   };
 
   // FBM (Fractal Brownian Motion) for natural-looking grain
@@ -196,18 +191,18 @@ export function generatePaperTexture(
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       // Generate multi-octave noise for natural grain
-      const nx = x / size * 8;
-      const ny = y / size * 8;
+      const nx = (x / size) * 8;
+      const ny = (y / size) * 8;
       const noise = fbm(nx, ny);
 
       // Map to 0.85-1.0 range for subtle texture (neutral paper)
       const value = Math.floor((noise * 0.15 + 0.85) * 255);
 
       const idx = (y * size + x) * 4;
-      data[idx] = value;     // R
+      data[idx] = value; // R
       data[idx + 1] = value; // G
       data[idx + 2] = value; // B
-      data[idx + 3] = 255;   // A
+      data[idx + 3] = 255; // A
     }
   }
 

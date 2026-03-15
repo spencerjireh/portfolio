@@ -17,7 +17,7 @@ export const kuwaharaShader = {
     u_useDisplacement: { value: 1 },
     u_brightness: { value: 1.4 },
     u_time: { value: 0.0 },
-    u_edgeDarkness: { value: 0.4 },     // How dark the water edge shadow is
+    u_edgeDarkness: { value: 0.4 }, // How dark the water edge shadow is
     u_distortionStrength: { value: 0.06 }, // Refraction intensity at edge
     u_sampleMode: { value: 0 }, // 0 = full (36 samples), 1 = reduced (16 samples)
   },

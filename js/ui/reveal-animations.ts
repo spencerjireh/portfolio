@@ -1,18 +1,21 @@
 export function initRevealAnimations(): () => void {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-      }
-    });
-  }, {
-    root: null,
-    threshold: 0.05,
-    rootMargin: '0px 0px 0px 0px'
-  });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    },
+    {
+      root: null,
+      threshold: 0.05,
+      rootMargin: '0px 0px 0px 0px',
+    },
+  );
 
   function observeAll(root: ParentNode): void {
-    root.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+    root.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => {
       observer.observe(el);
     });
   }

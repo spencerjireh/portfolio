@@ -4,11 +4,8 @@
  * Fully dynamic DOM -- no HTML markup needed in index.html.
  */
 
+import { API_BASE } from '../api/config';
 import { renderMarkdown } from '../chat/markdown';
-
-const API_BASE = import.meta.env.DEV
-  ? '/api/v1'
-  : 'https://folionaut.spencerjireh.com/api/v1';
 
 const STORAGE_KEY = 'chat-state';
 const MAX_MESSAGES = 100;
@@ -41,7 +38,7 @@ function generateVisitorId(): string {
   try {
     return crypto.randomUUID();
   } catch {
-    return 'v-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    return `v-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
   }
 }
 
@@ -54,7 +51,9 @@ function loadPersistedState(): PersistedState {
         return parsed;
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return { visitorId: generateVisitorId(), sessionId: null, messages: [] };
 }
 
@@ -65,7 +64,9 @@ function savePersistedState(state: PersistedState): void {
       messages: state.messages.slice(-MAX_MESSAGES),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -83,8 +84,8 @@ const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" f
 export function initChatWidget(): () => void {
   // State
   const persisted = loadPersistedState();
-  let messages: ChatMessage[] = persisted.messages;
-  let visitorId = persisted.visitorId;
+  const messages: ChatMessage[] = persisted.messages;
+  const visitorId = persisted.visitorId;
   let sessionId = persisted.sessionId;
   let isOpen = false;
   let isLoading = false;
@@ -164,10 +165,7 @@ export function initChatWidget(): () => void {
     wrapper.className = `chat-message chat-message--${msg.role}`;
     const bubble = document.createElement('div');
     bubble.className = 'chat-message-bubble';
-    bubble.innerHTML =
-      msg.role === 'assistant'
-        ? renderMarkdown(msg.content)
-        : escapeForDisplay(msg.content);
+    bubble.innerHTML = msg.role === 'assistant' ? renderMarkdown(msg.content) : escapeForDisplay(msg.content);
     wrapper.appendChild(bubble);
     messagesEl.appendChild(wrapper);
   }
@@ -221,7 +219,7 @@ export function initChatWidget(): () => void {
 
   function autoResize(): void {
     textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
   }
 
   // ---- Open / Close ----

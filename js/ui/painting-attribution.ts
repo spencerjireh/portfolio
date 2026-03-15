@@ -17,19 +17,23 @@ export function initPaintingAttribution(deps: PaintingAttributionDeps): () => vo
 
   const ac = new AbortController();
 
-  window.addEventListener('paintingchange', ((e: CustomEvent) => {
-    const { title, artist, isTransitioning } = e.detail;
+  window.addEventListener(
+    'paintingchange',
+    ((e: CustomEvent) => {
+      const { title, artist, isTransitioning } = e.detail;
 
-    titleEl.textContent = title;
-    artistEl.textContent = artist;
+      titleEl.textContent = title;
+      artistEl.textContent = artist;
 
-    if (isTransitioning) {
-      attribution.classList.add('is-transitioning');
-    } else {
-      attribution.classList.remove('is-transitioning');
-      attribution.classList.add('is-visible');
-    }
-  }) as EventListener, { signal: ac.signal });
+      if (isTransitioning) {
+        attribution.classList.add('is-transitioning');
+      } else {
+        attribution.classList.remove('is-transitioning');
+        attribution.classList.add('is-visible');
+      }
+    }) as EventListener,
+    { signal: ac.signal },
+  );
 
   if (deps.sceneController) {
     const index = deps.sceneController.currentPaintingIndex;

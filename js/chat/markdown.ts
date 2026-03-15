@@ -19,6 +19,7 @@ const renderer: RendererObject = {
 
   // Only allow http(s) links; open in new tab
   link({ href, tokens }) {
+    // biome-ignore lint/suspicious/noExplicitAny: marked's RendererObject binds `this` to the Lexer at runtime with no public type
     const text = (this as any).parser.parseInline(tokens);
     if (!/^https?:\/\//i.test(href)) return text;
     return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;

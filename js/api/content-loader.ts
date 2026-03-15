@@ -1,6 +1,6 @@
-import type { PortfolioBundle } from './types';
-import { fetchBundle } from './client';
 import { getCachedBundle, setCachedBundle } from './cache';
+import { fetchBundle } from './client';
+import type { PortfolioBundle } from './types';
 
 export async function loadContent(): Promise<PortfolioBundle | null> {
   // 1. Try API fetch with ETag

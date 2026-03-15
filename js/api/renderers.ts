@@ -1,16 +1,17 @@
-import type {
-  PortfolioBundle,
-  BioData,
-  EducationData,
-  LinkData,
-  ExperienceData,
-  SkillData,
-  ProjectData,
-  ContactData,
-  ContentRow,
-} from './types';
 import { initProjectAccordion } from '../ui/project-accordion';
 import { initProjectNavigation } from '../ui/project-navigation';
+import { escUrl } from '../utils';
+import type {
+  BioData,
+  ContactData,
+  ContentRow,
+  EducationData,
+  ExperienceData,
+  LinkData,
+  PortfolioBundle,
+  ProjectData,
+  SkillData,
+} from './types';
 
 const LINK_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>`;
 
@@ -33,14 +34,6 @@ function safeInline(s: string): string {
   return out;
 }
 
-function escUrl(url: string): string {
-  try {
-    const u = new URL(url, location.origin);
-    if (u.protocol === 'https:' || u.protocol === 'http:' || u.protocol === 'mailto:') return url;
-  } catch { /* invalid URL */ }
-  return '#';
-}
-
 // ── Hero ──
 
 function renderHero(bio: BioData, education: EducationData, links: LinkData): void {
@@ -54,7 +47,7 @@ function renderHero(bio: BioData, education: EducationData, links: LinkData): vo
   titleEl.textContent = bio.title;
 
   const eduLine = `<strong>${esc(education.degree)}</strong>, <em>${esc(education.institution)}</em> (${esc(education.year)}).`;
-  const paragraphs = [...bio.blurb.map(p => `<p>${safeInline(p)}</p>`), `<p>${eduLine}</p>`];
+  const paragraphs = [...bio.blurb.map((p) => `<p>${safeInline(p)}</p>`), `<p>${eduLine}</p>`];
   blurbEl.innerHTML = paragraphs.join('');
 
   linksEl.innerHTML = [
@@ -76,9 +69,7 @@ function renderExperiences(items: ContentRow<ExperienceData>[]): void {
 
   list.innerHTML = items
     .map(({ data }) => {
-      const responsibilitiesHtml = data.responsibilities
-        .map(r => `<li>${esc(r)}</li>`)
-        .join('');
+      const responsibilitiesHtml = data.responsibilities.map((r) => `<li>${esc(r)}</li>`).join('');
 
       return `<div class="experience-item reveal" data-experience>
   <span class="experience-year">${esc(data.year)}</span>
@@ -100,10 +91,7 @@ function renderExperiences(items: ContentRow<ExperienceData>[]): void {
 
 // ── Skills ──
 
-const TIER_CONFIG: Record<
-  string,
-  { title: string; subtitle: string; markerClass: string }
-> = {
+const TIER_CONFIG: Record<string, { title: string; subtitle: string; markerClass: string }> = {
   primary: {
     title: 'Primary Stack',
     subtitle: 'Daily drivers in production',
@@ -128,13 +116,14 @@ function renderSkills(items: ContentRow<SkillData>[]): void {
   const grouped: Record<string, ContentRow<SkillData>[]> = {};
   for (const item of items) {
     const tier = item.data.tier;
-    (grouped[tier] ??= []).push(item);
+    if (!grouped[tier]) grouped[tier] = [];
+    grouped[tier].push(item);
   }
 
   const tierOrder: string[] = ['primary', 'extended', 'familiar'];
   container.innerHTML = tierOrder
-    .filter(tier => grouped[tier]?.length)
-    .map(tier => {
+    .filter((tier) => grouped[tier]?.length)
+    .map((tier) => {
       const cfg = TIER_CONFIG[tier];
       const skillButtons = grouped[tier]
         .map(
@@ -166,58 +155,58 @@ function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
   if (items.length === 0) return [];
 
   // ── Build project section HTML ──
-  const sectionsHtml = items.map(({ data }, i) => {
-    const idx = i + 1;
+  const sectionsHtml = items
+    .map(({ data }, i) => {
+      const idx = i + 1;
 
-    // Desktop sidebar meta
-    let metaHtml = `<div class="project-meta-section">
+      // Desktop sidebar meta
+      let metaHtml = `<div class="project-meta-section">
           <h4 class="project-meta-label">Tech Stack</h4>
           <ul class="project-tech-list">
-            ${data.techStack.map(t => `<li>${esc(t)}</li>`).join('\n            ')}
+            ${data.techStack.map((t) => `<li>${esc(t)}</li>`).join('\n            ')}
           </ul>
         </div>`;
 
-    if (data.extraMeta?.length) {
-      for (const meta of data.extraMeta) {
-        metaHtml += `\n        <div class="project-meta-section">
+      if (data.extraMeta?.length) {
+        for (const meta of data.extraMeta) {
+          metaHtml += `\n        <div class="project-meta-section">
           <h4 class="project-meta-label">${esc(meta.label)}</h4>
           <p class="project-meta-value">${esc(meta.value)}</p>
         </div>`;
+        }
       }
-    }
 
-    metaHtml += `\n        <div class="project-meta-links">
-          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)} ${LINK_ICON}</a>`).join('\n          ')}
+      metaHtml += `\n        <div class="project-meta-links">
+          ${data.links.map((l) => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)} ${LINK_ICON}</a>`).join('\n          ')}
         </div>`;
 
-    if (data.metaNote) {
-      metaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
-    }
+      if (data.metaNote) {
+        metaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
+      }
 
-    // Mobile meta
-    let mobileMetaHtml = `<div class="project-meta-mobile-section">
+      // Mobile meta
+      let mobileMetaHtml = `<div class="project-meta-mobile-section">
           <h4 class="project-meta-label">Tech Stack</h4>
           <p class="project-meta-value">${esc(data.techStackMobile)}</p>
         </div>
         <div class="project-meta-mobile-links">
-          ${data.links.map(l => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)}</a>`).join('\n          ')}
+          ${data.links.map((l) => `<a href="${escUrl(l.url)}" target="_blank" rel="noopener noreferrer" class="project-link">${safeInline(l.label)}</a>`).join('\n          ')}
         </div>`;
 
-    if (data.metaNote) {
-      mobileMetaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
-    }
+      if (data.metaNote) {
+        mobileMetaHtml += `\n        <p class="project-meta-note">${safeInline(data.metaNote)}</p>`;
+      }
 
-    // Article content
-    const teaserHtml = `<p class="project-teaser">${esc(data.descriptions[0])}</p>`;
-    const descriptionsHtml = data.descriptions.slice(1)
-      .map(d => `<p class="project-description">${esc(d)}</p>`)
-      .join('\n        ');
+      // Article content
+      const teaserHtml = `<p class="project-teaser">${esc(data.descriptions[0])}</p>`;
+      const descriptionsHtml = data.descriptions
+        .slice(1)
+        .map((d) => `<p class="project-description">${esc(d)}</p>`)
+        .join('\n        ');
 
-    const highlightsHtml = data.highlights
-      .map(h => `<li>${esc(h)}</li>`)
-      .join('\n            ');
+      const highlightsHtml = data.highlights.map((h) => `<li>${esc(h)}</li>`).join('\n            ');
 
-    return `<section id="project-${idx}" class="section-framed section-right section-project" data-project-section="${idx}">
+      return `<section id="project-${idx}" class="section-framed section-right section-project" data-project-section="${idx}">
     <div class="section-card">
     <aside class="project-meta">
       <div class="project-meta-content">
@@ -229,7 +218,7 @@ function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
         <span class="project-num">${esc(data.num)}</span>
         <h2 class="project-title">${esc(data.title)}</h2>
         <div class="project-tags">
-          ${data.tags.map(t => `<span class="project-tag">${esc(t)}</span>`).join('\n          ')}
+          ${data.tags.map((t) => `<span class="project-tag">${esc(t)}</span>`).join('\n          ')}
         </div>
       </header>
       ${teaserHtml}
@@ -248,7 +237,8 @@ function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
     </article>
     </div>
   </section>`;
-  }).join('\n\n  ');
+    })
+    .join('\n\n  ');
 
   // ── Insert project sections before #contact ──
   const contactSection = document.getElementById('contact');
@@ -259,34 +249,40 @@ function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
   // ── Generate index nav items ──
   const indexNav = document.querySelector('.projects-index-nav');
   if (indexNav) {
-    indexNav.innerHTML = items.map(({ data }, i) => {
-      const idx = i + 1;
-      return `<a href="#project-${idx}" class="project-index-item" data-project-link="${idx}">
+    indexNav.innerHTML = items
+      .map(({ data }, i) => {
+        const idx = i + 1;
+        return `<a href="#project-${idx}" class="project-index-item" data-project-link="${idx}">
             <span class="project-index-num">${esc(data.num)}</span>
             <span class="project-index-title">${esc(data.title)}</span>
           </a>`;
-    }).join('\n          ');
+      })
+      .join('\n          ');
   }
 
   // ── Generate side nav items ──
   const sideNav = document.querySelector('[data-project-nav]');
   if (sideNav) {
-    sideNav.innerHTML = items.map(({ data }, i) => {
-      const idx = i + 1;
-      return `<a href="#project-${idx}" class="project-side-nav-item" data-nav-target="${idx}">
+    sideNav.innerHTML = items
+      .map(({ data }, i) => {
+        const idx = i + 1;
+        return `<a href="#project-${idx}" class="project-side-nav-item" data-nav-target="${idx}">
       <span class="project-side-nav-num">${esc(data.num)}</span>
       <span class="project-side-nav-line"></span>
     </a>`;
-    }).join('\n    ');
+      })
+      .join('\n    ');
   }
 
   // ── Generate dot nav items ──
   const dotsNav = document.querySelector('[data-project-dots]');
   if (dotsNav) {
-    dotsNav.innerHTML = items.map((_, i) => {
-      const idx = i + 1;
-      return `<button class="project-dot" data-dot-target="${idx}" aria-label="Go to project ${idx}"></button>`;
-    }).join('\n    ');
+    dotsNav.innerHTML = items
+      .map((_, i) => {
+        const idx = i + 1;
+        return `<button class="project-dot" data-dot-target="${idx}" aria-label="Go to project ${idx}"></button>`;
+      })
+      .join('\n    ');
   }
 
   // ── Init UI that depends on dynamic project DOM ──

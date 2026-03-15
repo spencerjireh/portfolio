@@ -1,3 +1,5 @@
+import { escUrl } from '../utils';
+
 export function initExperiencePanel(): () => void {
   const panel = document.querySelector<HTMLElement>('[data-experience-panel]');
   const closeBtn = document.querySelector<HTMLButtonElement>('[data-panel-close]');
@@ -48,7 +50,7 @@ export function initExperiencePanel(): () => void {
     if (panelTech) panelTech.textContent = tech;
 
     if (panelLink) {
-      panelLink.href = website;
+      panelLink.href = escUrl(website);
       panelLink.style.display = website ? 'inline-flex' : 'none';
     }
 
@@ -119,10 +121,14 @@ export function initExperiencePanel(): () => void {
     accordion.className = 'experience-accordion';
 
     accordion.innerHTML = `
-      ${description ? `
+      ${
+        description
+          ? `
       <div class="experience-accordion-section">
         <p class="experience-accordion-description">${description}</p>
-      </div>` : ''}
+      </div>`
+          : ''
+      }
       <div class="experience-accordion-section">
         <h4 class="experience-accordion-title">Responsibilities</h4>
         <ul class="experience-accordion-list">${responsibilities?.innerHTML || ''}</ul>
@@ -131,15 +137,19 @@ export function initExperiencePanel(): () => void {
         <h4 class="experience-accordion-title">Tech Stack</h4>
         <p class="experience-accordion-content">${tech}</p>
       </div>
-      ${website ? `
+      ${
+        website
+          ? `
       <div class="experience-accordion-section">
-        <a href="${website}" target="_blank" rel="noopener noreferrer" class="experience-accordion-link">
+        <a href="${escUrl(website)}" target="_blank" rel="noopener noreferrer" class="experience-accordion-link">
           Visit Company
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
           </svg>
         </a>
-      </div>` : ''}
+      </div>`
+          : ''
+      }
     `;
 
     return accordion;
@@ -148,7 +158,7 @@ export function initExperiencePanel(): () => void {
   const toggleAccordion = (item: HTMLElement): void => {
     const isExpanded = item.classList.contains('is-expanded');
 
-    list.querySelectorAll<HTMLElement>('[data-experience]').forEach(otherItem => {
+    list.querySelectorAll<HTMLElement>('[data-experience]').forEach((otherItem) => {
       if (otherItem !== item && otherItem.classList.contains('is-expanded')) {
         otherItem.classList.remove('is-expanded');
         const accordion = otherItem.querySelector('.experience-accordion');
@@ -217,10 +227,14 @@ export function initExperiencePanel(): () => void {
   panel.addEventListener('mouseenter', onPanelEnter, { signal: ac.signal });
   panel.addEventListener('mouseleave', onPanelLeave, { signal: ac.signal });
 
-  closeBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closePanel();
-  }, { signal: ac.signal });
+  closeBtn?.addEventListener(
+    'click',
+    (e) => {
+      e.stopPropagation();
+      closePanel();
+    },
+    { signal: ac.signal },
+  );
 
   const handleResize = (): void => {
     const wasDesktop = isDesktop;
@@ -230,7 +244,7 @@ export function initExperiencePanel(): () => void {
       clearHideTimeout();
       hoveredItem = null;
       closePanel();
-      list.querySelectorAll<HTMLElement>('[data-experience]').forEach(item => {
+      list.querySelectorAll<HTMLElement>('[data-experience]').forEach((item) => {
         item.classList.remove('is-expanded', 'is-active');
         const accordion = item.querySelector('.experience-accordion');
         if (accordion) accordion.remove();
