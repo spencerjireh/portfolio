@@ -5,6 +5,8 @@ export function initExperiencePanel(): () => void {
 
   if (!panel || !list) return () => {};
 
+  const ac = new AbortController();
+
   const panelTitle = panel.querySelector<HTMLElement>('[data-panel-title]');
   const panelCompany = panel.querySelector<HTMLElement>('[data-panel-company]');
   const panelDuration = panel.querySelector<HTMLElement>('[data-panel-duration]');
@@ -201,9 +203,9 @@ export function initExperiencePanel(): () => void {
     }
   };
 
-  list.addEventListener('mouseover', onMouseover);
-  list.addEventListener('mouseleave', onMouseleave);
-  list.addEventListener('click', onClick);
+  list.addEventListener('mouseover', onMouseover, { signal: ac.signal });
+  list.addEventListener('mouseleave', onMouseleave, { signal: ac.signal });
+  list.addEventListener('click', onClick, { signal: ac.signal });
 
   // Panel hover keeps it open (panel itself is outside .experience-list)
   const onPanelEnter = (): void => {
@@ -212,13 +214,13 @@ export function initExperiencePanel(): () => void {
   const onPanelLeave = (): void => {
     if (isDesktop && !pinnedItem) scheduleHidePanel();
   };
-  panel.addEventListener('mouseenter', onPanelEnter);
-  panel.addEventListener('mouseleave', onPanelLeave);
+  panel.addEventListener('mouseenter', onPanelEnter, { signal: ac.signal });
+  panel.addEventListener('mouseleave', onPanelLeave, { signal: ac.signal });
 
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     closePanel();
-  });
+  }, { signal: ac.signal });
 
   const handleResize = (): void => {
     const wasDesktop = isDesktop;
@@ -236,14 +238,7 @@ export function initExperiencePanel(): () => void {
     }
   };
 
-  window.addEventListener('resize', handleResize);
+  window.addEventListener('resize', handleResize, { signal: ac.signal });
 
-  return () => {
-    list.removeEventListener('mouseover', onMouseover);
-    list.removeEventListener('mouseleave', onMouseleave);
-    list.removeEventListener('click', onClick);
-    panel.removeEventListener('mouseenter', onPanelEnter);
-    panel.removeEventListener('mouseleave', onPanelLeave);
-    window.removeEventListener('resize', handleResize);
-  };
+  return () => ac.abort();
 }

@@ -162,8 +162,8 @@ function renderSkills(items: ContentRow<SkillData>[]): void {
 
 // ── Projects ──
 
-function renderProjects(items: ContentRow<ProjectData>[]): void {
-  if (items.length === 0) return;
+function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
+  if (items.length === 0) return [];
 
   // ── Build project section HTML ──
   const sectionsHtml = items.map(({ data }, i) => {
@@ -290,8 +290,7 @@ function renderProjects(items: ContentRow<ProjectData>[]): void {
   }
 
   // ── Init UI that depends on dynamic project DOM ──
-  initProjectNavigation();
-  initProjectAccordion();
+  return [initProjectNavigation(), initProjectAccordion()];
 }
 
 // ── Contact ──
@@ -321,12 +320,13 @@ function renderContact(data: ContactData): void {
 
 // ── Public API ──
 
-export function renderAllContent(bundle: PortfolioBundle): void {
+export function renderAllContent(bundle: PortfolioBundle): (() => void)[] {
   if (bundle.bio.length && bundle.education.length && bundle.link.length)
     renderHero(bundle.bio[0].data, bundle.education[0].data, bundle.link[0].data);
   if (bundle.experience.length) renderExperiences(bundle.experience);
   if (bundle.skill.length) renderSkills(bundle.skill);
   // hobby: chat-only content, not rendered on frontend
-  if (bundle.project.length) renderProjects(bundle.project);
+  const disposers = bundle.project.length ? renderProjects(bundle.project) : [];
   if (bundle.contact.length) renderContact(bundle.contact[0].data);
+  return disposers;
 }

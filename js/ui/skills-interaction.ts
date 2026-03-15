@@ -3,6 +3,8 @@ export function initSkillsInteraction(): () => void {
 
   if (!container) return () => {};
 
+  const ac = new AbortController();
+
   const collapseAll = (): void => {
     container.querySelectorAll<HTMLButtonElement>('[data-skill].is-expanded')
       .forEach(item => item.classList.remove('is-expanded'));
@@ -38,17 +40,13 @@ export function initSkillsInteraction(): () => void {
     }
   };
 
-  container.addEventListener('click', onClick);
-  container.addEventListener('keydown', onKeydown);
+  container.addEventListener('click', onClick, { signal: ac.signal });
+  container.addEventListener('keydown', onKeydown, { signal: ac.signal });
 
   const escapeHandler = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') collapseAll();
   };
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', escapeHandler, { signal: ac.signal });
 
-  return () => {
-    container.removeEventListener('click', onClick);
-    container.removeEventListener('keydown', onKeydown);
-    document.removeEventListener('keydown', escapeHandler);
-  };
+  return () => ac.abort();
 }

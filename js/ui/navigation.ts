@@ -13,6 +13,8 @@ export function initNavigation(deps: NavigationDeps): () => void {
 
   if (!menuTrigger || !dropdownMenu) return () => {};
 
+  const ac = new AbortController();
+
   const openMenu = () => {
     dropdownMenu.classList.add('active');
     dropdownMenu.setAttribute('aria-hidden', 'false');
@@ -33,27 +35,27 @@ export function initNavigation(deps: NavigationDeps): () => void {
     } else {
       openMenu();
     }
-  });
+  }, { signal: ac.signal });
 
   dropdownLinks?.forEach(link => {
     if (link.hasAttribute('data-change-painting')) return;
     link.addEventListener('click', () => {
       closeMenu();
-    });
+    }, { signal: ac.signal });
   });
 
   changePaintingBtn?.addEventListener('click', () => {
     if (!deps.sceneController || deps.isMobile) return;
     if (deps.sceneController.isWashTransitioning) return;
     deps.sceneController.triggerNextPainting();
-  });
+  }, { signal: ac.signal });
 
   const escapeHandler = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && dropdownMenu.classList.contains('active')) {
       closeMenu();
     }
   };
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', escapeHandler, { signal: ac.signal });
 
   const clickOutsideHandler = (e: Event) => {
     if (!dropdownMenu.classList.contains('active')) return;
@@ -66,10 +68,7 @@ export function initNavigation(deps: NavigationDeps): () => void {
       closeMenu();
     }
   };
-  document.addEventListener('click', clickOutsideHandler);
+  document.addEventListener('click', clickOutsideHandler, { signal: ac.signal });
 
-  return () => {
-    document.removeEventListener('keydown', escapeHandler);
-    document.removeEventListener('click', clickOutsideHandler);
-  };
+  return () => ac.abort();
 }

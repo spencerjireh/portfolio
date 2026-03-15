@@ -1,11 +1,13 @@
-export function initProjectNavigation(): void {
+export function initProjectNavigation(): () => void {
   const sideNav = document.querySelector<HTMLElement>('[data-project-nav]');
   const dotsNav = document.querySelector<HTMLElement>('[data-project-dots]');
   const projectSections = document.querySelectorAll<HTMLElement>('[data-project-section]');
   const sideNavItems = sideNav?.querySelectorAll<HTMLAnchorElement>('[data-nav-target]');
   const dotButtons = dotsNav?.querySelectorAll<HTMLButtonElement>('[data-dot-target]');
 
-  if (!sideNav || !dotsNav || projectSections.length === 0) return;
+  if (!sideNav || !dotsNav || projectSections.length === 0) return () => {};
+
+  const ac = new AbortController();
 
   const setActiveProject = (projectNum: string | null): void => {
     sideNavItems?.forEach(item => {
@@ -85,7 +87,7 @@ export function initProjectNavigation(): void {
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
+    }, { signal: ac.signal });
   });
 
   dotButtons?.forEach(dot => {
@@ -104,6 +106,12 @@ export function initProjectNavigation(): void {
           }, 400);
         }
       }
-    });
+    }, { signal: ac.signal });
   });
+
+  return () => {
+    ac.abort();
+    projectObserver.disconnect();
+    hideNavObserver.disconnect();
+  };
 }

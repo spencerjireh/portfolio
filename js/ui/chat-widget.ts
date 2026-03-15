@@ -95,6 +95,8 @@ export function initChatWidget(): () => void {
   let touchStartY = 0;
   let wasMobile = isMobile();
 
+  const ac = new AbortController();
+
   // ---- DOM creation ----
   const fab = document.createElement('button');
   fab.className = 'chat-fab';
@@ -477,32 +479,22 @@ export function initChatWidget(): () => void {
 
   // ---- Bind events ----
 
-  fab.addEventListener('click', onFabClick);
-  closeBtn.addEventListener('click', onCloseClick);
-  sendBtn.addEventListener('click', onSendClick);
-  textarea.addEventListener('keydown', onTextareaKeydown);
-  textarea.addEventListener('input', onTextareaInput);
-  document.addEventListener('keydown', onGlobalKeydown);
-  document.addEventListener('click', onDocumentClick);
-  header.addEventListener('touchstart', onTouchStart, { passive: true });
-  header.addEventListener('touchmove', onTouchMove, { passive: false });
-  header.addEventListener('touchend', onTouchEnd);
-  window.addEventListener('resize', onWindowResize);
+  fab.addEventListener('click', onFabClick, { signal: ac.signal });
+  closeBtn.addEventListener('click', onCloseClick, { signal: ac.signal });
+  sendBtn.addEventListener('click', onSendClick, { signal: ac.signal });
+  textarea.addEventListener('keydown', onTextareaKeydown, { signal: ac.signal });
+  textarea.addEventListener('input', onTextareaInput, { signal: ac.signal });
+  document.addEventListener('keydown', onGlobalKeydown, { signal: ac.signal });
+  document.addEventListener('click', onDocumentClick, { signal: ac.signal });
+  header.addEventListener('touchstart', onTouchStart, { passive: true, signal: ac.signal });
+  header.addEventListener('touchmove', onTouchMove, { passive: false, signal: ac.signal });
+  header.addEventListener('touchend', onTouchEnd, { signal: ac.signal });
+  window.addEventListener('resize', onWindowResize, { signal: ac.signal });
 
   // ---- Dispose ----
 
   return () => {
-    fab.removeEventListener('click', onFabClick);
-    closeBtn.removeEventListener('click', onCloseClick);
-    sendBtn.removeEventListener('click', onSendClick);
-    textarea.removeEventListener('keydown', onTextareaKeydown);
-    textarea.removeEventListener('input', onTextareaInput);
-    document.removeEventListener('keydown', onGlobalKeydown);
-    document.removeEventListener('click', onDocumentClick);
-    header.removeEventListener('touchstart', onTouchStart);
-    header.removeEventListener('touchmove', onTouchMove);
-    header.removeEventListener('touchend', onTouchEnd);
-    window.removeEventListener('resize', onWindowResize);
+    ac.abort();
     unbindVisualViewport();
     clearRateLimitTimer();
     document.body.style.overflow = '';

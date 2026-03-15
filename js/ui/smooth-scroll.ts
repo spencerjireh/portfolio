@@ -1,5 +1,6 @@
-export function initSmoothScroll(): void {
+export function initSmoothScroll(): () => void {
   const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+  const ac = new AbortController();
 
   links.forEach(link => {
     link.addEventListener('click', (e: MouseEvent) => {
@@ -15,6 +16,8 @@ export function initSmoothScroll(): void {
           block: 'start'
         });
       }
-    });
+    }, { signal: ac.signal });
   });
+
+  return () => ac.abort();
 }

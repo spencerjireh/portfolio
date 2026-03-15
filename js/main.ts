@@ -58,9 +58,12 @@ class Portfolio {
       }
     }
 
-    const contentReady = loadContent().then(bundle => {
+    const contentReady = contentPromise.then(bundle => {
       try {
-        if (bundle) renderAllContent(bundle);
+        if (bundle) {
+          const contentDisposers = renderAllContent(bundle);
+          this.disposers.push(...contentDisposers);
+        }
       } catch (e) {
         console.warn('Content render failed, using hardcoded HTML:', e);
       }
@@ -77,17 +80,17 @@ class Portfolio {
       isMobile: this.threeManager?.isMobile ?? isMobile,
     });
     const revealDispose = initRevealAnimations();
-    initSmoothScroll();
+    const scrollDispose = initSmoothScroll();
     const expDispose = initExperiencePanel();
     const skillsDispose = initSkillsInteraction();
-    initPaintingAttribution({
+    const attrDispose = initPaintingAttribution({
       sceneController: this.sceneController,
       isMobile,
     });
-    initCopyEmail();
+    const emailDispose = initCopyEmail();
     const chatDispose = initChatWidget();
 
-    this.disposers.push(navDispose, revealDispose, expDispose, skillsDispose, chatDispose);
+    this.disposers.push(navDispose, revealDispose, scrollDispose, expDispose, skillsDispose, attrDispose, emailDispose, chatDispose);
   }
 
   initWebGL(isMobile: boolean): void {
@@ -131,5 +134,6 @@ class Portfolio {
   }
 }
 
+const contentPromise = loadContent();
 const portfolio = new Portfolio();
 window.portfolio = portfolio;

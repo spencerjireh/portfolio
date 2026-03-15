@@ -6,14 +6,16 @@ interface PaintingAttributionDeps {
   isMobile: boolean;
 }
 
-export function initPaintingAttribution(deps: PaintingAttributionDeps): void {
+export function initPaintingAttribution(deps: PaintingAttributionDeps): () => void {
   const attribution = document.querySelector<HTMLElement>('[data-painting-attribution]');
   const titleEl = document.querySelector<HTMLElement>('[data-painting-title]');
   const artistEl = document.querySelector<HTMLElement>('[data-painting-artist]');
 
-  if (!attribution || !titleEl || !artistEl) return;
+  if (!attribution || !titleEl || !artistEl) return () => {};
 
-  if (deps.isMobile) return;
+  if (deps.isMobile) return () => {};
+
+  const ac = new AbortController();
 
   window.addEventListener('paintingchange', ((e: CustomEvent) => {
     const { title, artist, isTransitioning } = e.detail;
@@ -27,7 +29,7 @@ export function initPaintingAttribution(deps: PaintingAttributionDeps): void {
       attribution.classList.remove('is-transitioning');
       attribution.classList.add('is-visible');
     }
-  }) as EventListener);
+  }) as EventListener, { signal: ac.signal });
 
   if (deps.sceneController) {
     const index = deps.sceneController.currentPaintingIndex;
@@ -36,4 +38,6 @@ export function initPaintingAttribution(deps: PaintingAttributionDeps): void {
     artistEl.textContent = painting.artist;
     attribution.classList.add('is-visible');
   }
+
+  return () => ac.abort();
 }

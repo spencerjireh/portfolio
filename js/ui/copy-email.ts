@@ -1,5 +1,6 @@
-export function initCopyEmail(): void {
+export function initCopyEmail(): () => void {
   const emailBtns = document.querySelectorAll<HTMLButtonElement>('[data-copy-email]');
+  const ac = new AbortController();
 
   emailBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -16,6 +17,8 @@ export function initCopyEmail(): void {
       } catch (err) {
         console.warn('Clipboard API failed, using fallback');
       }
-    });
+    }, { signal: ac.signal });
   });
+
+  return () => ac.abort();
 }
