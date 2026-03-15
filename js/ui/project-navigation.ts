@@ -39,26 +39,15 @@ export function initProjectNavigation(): () => void {
     }
   };
 
-  const projectObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const projectNum = entry.target.getAttribute('data-project-section');
-          if (projectNum) {
-            setActiveProject(projectNum);
-            setNavVisibility(true);
-          }
-        }
-      });
-    },
-    {
-      root: null,
-      rootMargin: '-50% 0px -50% 0px',
-      threshold: 0,
-    },
-  );
+  // Single observer for all tracked sections to avoid race conditions between
+  // competing observers that cause nav flicker at section boundaries.
+  const allSections = new Map<Element, string | null>();
 
-  const hideNavSections = [
+  for (const section of projectSections) {
+    allSections.set(section, section.getAttribute('data-project-section'));
+  }
+
+  const nonProjectSections = [
     document.getElementById('hero'),
     document.getElementById('experience'),
     document.getElementById('skills'),
@@ -66,14 +55,23 @@ export function initProjectNavigation(): () => void {
     document.getElementById('contact'),
   ].filter(Boolean) as HTMLElement[];
 
-  const hideNavObserver = new IntersectionObserver(
+  for (const section of nonProjectSections) {
+    allSections.set(section, null);
+  }
+
+  const sectionObserver = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const projectNum = allSections.get(entry.target);
+        if (projectNum) {
+          setActiveProject(projectNum);
+          setNavVisibility(true);
+        } else {
           setNavVisibility(false);
           setActiveProject(null);
         }
-      });
+      }
     },
     {
       root: null,
@@ -82,8 +80,7 @@ export function initProjectNavigation(): () => void {
     },
   );
 
-  for (const section of projectSections) projectObserver.observe(section);
-  for (const section of hideNavSections) hideNavObserver.observe(section);
+  for (const section of allSections.keys()) sectionObserver.observe(section);
 
   sideNavItems?.forEach((item) => {
     item.addEventListener(
@@ -125,7 +122,6 @@ export function initProjectNavigation(): () => void {
 
   return () => {
     ac.abort();
-    projectObserver.disconnect();
-    hideNavObserver.disconnect();
+    sectionObserver.disconnect();
   };
 }
