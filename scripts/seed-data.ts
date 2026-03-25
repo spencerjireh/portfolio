@@ -44,7 +44,7 @@ export const seedItems: SeedItem[] = [
     data: {
       github: 'https://github.com/spencerjireh',
       linkedin: 'https://www.linkedin.com/in/spencerjireh',
-      resumePath: 'https://spencerjireh.github.io/myrendercv/',
+      resumePath: 'https://spencerjireh.github.io/myrendercv/Spencer_Jireh_Cebrian_CV.pdf',
       email: 'spencercebrian123@gmail.com',
     },
     status: 'published',
