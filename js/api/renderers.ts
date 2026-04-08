@@ -200,7 +200,6 @@ function renderProjects(items: ContentRow<ProjectData>[]): (() => void)[] {
       // Article content
       const teaserHtml = `<p class="project-teaser">${esc(data.descriptions[0])}</p>`;
       const descriptionsHtml = data.descriptions
-        .slice(1)
         .map((d) => `<p class="project-description">${esc(d)}</p>`)
         .join('\n        ');
 
